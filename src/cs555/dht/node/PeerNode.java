@@ -1,31 +1,44 @@
 package cs555.dht.node;
 
 import cs555.dht.communications.Link;
+import cs555.dht.peer.Peer;
+import cs555.dht.state.State;
 import cs555.dht.utilities.*;
-import cs555.dht.wireformats.*;
+import cs555.dht.wireformats.RegisterRequest;
+import cs555.dht.wireformats.RegisterResponse;
 
 public class PeerNode extends Node{
 
+	int port;
+	int hashSpace;
 	Link managerLink;
 	Link accessPoint;
 	int refreshTime;
 	String nickname;
+	String hostname;
+	
+	State state;
 
 	//================================================================================
 	// Constructor
 	//================================================================================
-	public PeerNode(int port, String n, int r){
-		super(port);
+	public PeerNode(int p, String n, int r, int s){
+		super(p);
 
+		port = p;
 		nickname = n;
 		refreshTime = r;
 
 		if (nickname.equalsIgnoreCase("")) {
-			nickname = Tools.generateHash();
+			nickname = Tools.generateHash(s);
 		}
 
 		managerLink = null;
 		accessPoint = null;
+		
+		state = new State(s);
+		hashSpace = s;
+		hostname = Tools.getLocalHostname();
 	}
 
 	//================================================================================
@@ -40,7 +53,30 @@ public class PeerNode extends Node{
 	}
 
 	public void enterDHT(String dHost, int dPort) {
+		managerLink = connect(new Peer(dHost, dPort));
+		RegisterRequest regiserReq = new RegisterRequest(hostname, port, nickname);
+		managerLink.sendData(regiserReq.marshall());
 		
+		// Keep sending until we are able to enter
+		while (managerLink.waitForIntReply() == Constants.Failure) {
+			nickname = Tools.generateHash(hashSpace);
+			regiserReq = new RegisterRequest(hostname, port, nickname);
+		}
+		
+		RegisterResponse accessPoint = new RegisterResponse();
+		accessPoint.unmarshall(managerLink.waitForData());
+		
+		// If we hear back from Discovery node with our info, we are the first to arrive
+		if (regiserReq.equals(accessPoint)) {
+			Peer self = new Peer(hostname, port, nickname);
+			state.addPredecessor(self);
+			state.addSucessor(self);
+		}
+		
+		// Otherwise send lookup request to our access point
+		else {
+			
+		}
 	}
 	
 	//================================================================================
@@ -76,6 +112,7 @@ public class PeerNode extends Node{
 		int localPort = 0;
 		String nickname = "";
 		int refreshTime = 30;
+		int idSpace = 16;
 
 		if (args.length >= 3) {
 			discoveryHost = args[0];
@@ -87,18 +124,25 @@ public class PeerNode extends Node{
 
 				if (args.length >= 5) {
 					refreshTime = Integer.parseInt(args[4]);
+					
+					if (args.length >= 6) {
+						idSpace = Integer.parseInt(args[5]);
+					}
 				}
 			}
 		}
 
 		else {
-			System.out.println("Usage: java cs555.dht.node.PeerNode DISCOVERY-NODE DISCOVERY-PORT LOCAL-PORT <HASH> <REFRESH-TIME>");
+			System.out.println("Usage: java cs555.dht.node.PeerNode DISCOVERY-NODE DISCOVERY-PORT LOCAL-PORT <HASH> <REFRESH-TIME> <ID-SPACE>");
 			System.exit(1);
 		}
 
 
 		// Create node
-		PeerNode peer = new PeerNode(localPort, nickname, refreshTime);
+		PeerNode peer = new PeerNode(localPort, nickname, refreshTime, idSpace);
+		
+		// Enter DHT
+		peer.enterDHT(discoveryHost, discoveryPort);
 		peer.initServer();
 
 	}

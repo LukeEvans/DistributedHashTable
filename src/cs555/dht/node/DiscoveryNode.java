@@ -68,7 +68,7 @@ public class DiscoveryNode extends Node{
 		}
 		
 		else {
-			System.out.println("Usage: java cs555.dht.node.Discovery PORT");
+			System.out.println("Usage: java cs555.dht.node.DiscoveryNode PORT");
 			System.exit(1);
 		}
 

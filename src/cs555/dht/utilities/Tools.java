@@ -156,7 +156,7 @@ public class Tools {
 	}
 
 	// Generates hash
-	public static String generateHash() {
+	public static String generateHash(int space) {
 		return "AAAAA";
 	}
 	

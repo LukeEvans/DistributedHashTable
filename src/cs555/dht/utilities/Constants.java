@@ -15,6 +15,7 @@ public class Constants {
 	public static final int Registration_Reply = 9;
 	public static final int lookup_request = 10;
 	public static final int lookup_reply = 11;
+	public static final int store_request = 12;
 	
 	public static final int Failure = 99;
 	public static final int Success = 100;

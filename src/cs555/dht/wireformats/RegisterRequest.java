@@ -105,6 +105,7 @@ public class RegisterRequest{
 	//================================================================================
 	// House Keeping
 	//================================================================================
+	// Override the toString method
 	public String toString(){
 		String s = "";
 		
@@ -113,4 +114,16 @@ public class RegisterRequest{
 		return s;
 	}
 	
+	// Override the equals method
+	public boolean equals(RegisterRequest other) {
+		if (this.hostName.equalsIgnoreCase(other.hostName)) {
+			if (this.port == other.port) {
+				if (this.nickName.equalsIgnoreCase(other.nickName)) {
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
 }
