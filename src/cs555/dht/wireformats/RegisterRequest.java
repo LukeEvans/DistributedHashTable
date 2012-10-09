@@ -1,60 +1,47 @@
 package cs555.dht.wireformats;
 
-import java.net.URL;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 
 import cs555.dht.utilities.Constants;
 import cs555.dht.utilities.Tools;
 
-public class FetchRequest {
+public class RegisterRequest{
 
 	public int size;
 	
 	public int type; // 4
-	public int depth; // 4
 	
-	public int domainLength; // 4 
-	public String domain; // domainLength
+	public int hostLength; // 4 
+	public String hostName; // hostLength
 	
-	public int urlLength; // 4
-	public String url; // urllength
+	public int port; // 4
 	
-	public int numberOfLinks; // 4
-	public ArrayList<String> links; // for each + 4
+	public int nickNameLength; // 4
+	public String nickName; // nickNameLength
 	
 	
 	//================================================================================
 	// Constructors
 	//================================================================================
-	public FetchRequest(String d, int dep, String u, ArrayList<String> list){
-		init(d, dep, u, list);
+	public RegisterRequest(String h, int p, String n){
+		init(h, p, n);
 	}
 	
-	public FetchRequest(String d, int dep, String u, URL[] urls){
-		init(d, dep, u, removeUnrelatedLinks(urls,d));
+	public RegisterRequest(){
+		init("",0,"");
+	}
+	
+	public void init(String h, int p, String n){
+		type = Constants.Registration_Request;
+		hostLength = h.length();
+		hostName = h;
 		
-	}
-	
-	public FetchRequest(){
-		init("",0,"",new ArrayList<String>());
-	}
-	
-	public void init(String d, int dep, String u, ArrayList<String> list){
-		domainLength = d.length();
-		domain = d;
-		urlLength = u.length();
-		url = u;
-		links = list;
-		type = Constants.Fetch_Request;
-		depth = dep;
-		numberOfLinks = list.size();
+		port = p;
 		
-		size = 4 + 4 + 4 + domainLength + 4 + urlLength + 4;
-		for (String s : links){
-			size += 4;
-			size += s.length();
-		}
+		nickNameLength = n.length();
+		nickName = n;
+		
+		size = 4 + 4 + hostLength + 4 + 4 + nickNameLength;
 	}
 	
 	
@@ -71,23 +58,16 @@ public class FetchRequest {
 		// type
 		bbuff.putInt(type);
 		
-		// Depth 
-		bbuff.putInt(depth);
+		// Host length and hostname
+		bbuff.putInt(hostLength);
+		bbuff.put(Tools.convertToBytes(hostName));
 		
-		// Domain length and domain
-		bbuff.putInt(domainLength);
-		bbuff.put(Tools.convertToBytes(domain));
+		// Port 
+		bbuff.putInt(port);
 		
-		// Url length and url
-		bbuff.putInt(urlLength);
-		bbuff.put(Tools.convertToBytes(url));
-		
-		// number of links and links
-		bbuff.putInt(numberOfLinks);
-		for (String s : links){
-			bbuff.putInt(s.length());
-			bbuff.put(Tools.convertToBytes(s));
-		}
+		// nickname length and nickname
+		bbuff.putInt(nickNameLength);
+		bbuff.put(Tools.convertToBytes(nickName));
 		
 		return bytes;
 	}
@@ -105,30 +85,21 @@ public class FetchRequest {
 		// type
 		type = bbuff.getInt();
 		
-		// Depth
-		depth = bbuff.getInt();
+		// Host length and hostname
+		hostLength = bbuff.getInt();
+		byte[] hostBytes = new byte[hostLength];
+		bbuff.get(hostBytes);
+		hostName = new String(hostBytes,0,hostLength);
 		
-		// Domain length and domain
-		domainLength = bbuff.getInt();
-		byte[] domainBytes = new byte[domainLength];
-		bbuff.get(domainBytes);
-		domain = new String(domainBytes,0,domainLength);
-		
+		// Port
+		port = bbuff.getInt();
 		
 		// Url length and url
-		urlLength = bbuff.getInt();
-		byte[] urlBytes = new byte[urlLength];
-		bbuff.get(urlBytes);
-		url = new String(urlBytes,0,urlLength);
+		nickNameLength = bbuff.getInt();
+		byte[] nickNameBytes = new byte[nickNameLength];
+		bbuff.get(nickNameBytes);
+		nickName = new String(nickNameBytes,0,nickNameLength);
 		
-		// number of links and links
-		numberOfLinks = bbuff.getInt();
-		for (int i=0; i<numberOfLinks; i++){			
-			int strLen = bbuff.getInt();
-			byte[] stringBytes = new byte[strLen];
-			bbuff.get(stringBytes);
-			links.add(new String(stringBytes,0,strLen));
-		}
 	}
 	
 	//================================================================================
@@ -137,32 +108,9 @@ public class FetchRequest {
 	public String toString(){
 		String s = "";
 		
-		s += "Fetch: " + type + "\n";
-		s += "Domain: " + domain + "\n";
-		s += "URL:    " + url + "\n";
-		s += "Depth: " + depth + "\n";
-		
-		s += "[ ";
-		for (String string : links){
-			s += string + ", ";
-		}
-		s += "]\n";
+		s += "Peer: " + hostName + ":" + port + ", " + nickName + "\n";
 		
 		return s;
 	}
 	
-	
-	public ArrayList<String> removeUnrelatedLinks(URL[] urls,String d){
-		ArrayList<String> relatedLinks = new ArrayList<String>();
-		
-		for (URL url : urls){
-			String urlString = url.toString();
-		
-			if (urlString.startsWith(d)){
-				relatedLinks.add(urlString);
-			}
-		}
-		
-		return relatedLinks;
-	}
 }

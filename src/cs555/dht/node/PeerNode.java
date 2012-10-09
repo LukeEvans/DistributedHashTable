@@ -1,30 +1,46 @@
 package cs555.dht.node;
 
 import cs555.dht.communications.Link;
-import cs555.dht.utilities.Constants;
-import cs555.dht.utilities.Tools;
-import cs555.dht.wireformats.ElectionMessage;
-import cs555.dht.wireformats.FetchRequest;
-import cs555.dht.wireformats.Verification;
-import cs555.dht.peer.Peer;
+import cs555.dht.utilities.*;
+import cs555.dht.wireformats.*;
 
 public class PeerNode extends Node{
 
-	Peer nodeManager;
 	Link managerLink;
+	Link accessPoint;
+	int refreshTime;
+	String nickname;
 
 	//================================================================================
 	// Constructor
 	//================================================================================
-	public PeerNode(int port,int threads){
+	public PeerNode(int port, String n, int r){
 		super(port);
-		nodeManager = null;
+
+		nickname = n;
+		refreshTime = r;
+
+		if (nickname.equalsIgnoreCase("")) {
+			nickname = Tools.generateHash();
+		}
+
 		managerLink = null;
+		accessPoint = null;
 	}
 
-
+	//================================================================================
+	// Init
+	//================================================================================
 	public void initServer(){
 		super.initServer();
+
+		// Start thread for refreshing hash
+		// refreshThread(r, this);
+		// refreshThread.start();
+	}
+
+	public void enterDHT(String dHost, int dPort) {
+		
 	}
 	
 	//================================================================================
@@ -35,29 +51,12 @@ public class PeerNode extends Node{
 		int messageType = Tools.getMessageType(bytes);
 
 		switch (messageType) {
-		case Constants.Election_Message:
-			ElectionMessage election = new ElectionMessage();
-			election.unmarshall(bytes);
-			
-			Verification electionReply = new Verification(election.type);
-			l.sendData(electionReply.marshall());
-			
-			nodeManager = new Peer(election.host, election.port);
-			managerLink = connect(nodeManager);
-			
-			System.out.println("Elected Official: " + election);
-			
+		case Constants.lookup_request:
+
+			System.out.println("Lookup Request");
+
 			break;
 
-		case Constants.Fetch_Request:
-			FetchRequest request = new FetchRequest();
-			request.unmarshall(bytes);
-			
-			System.out.println("Got: \n" + request);
-			
-			
-			break;
-			
 		default:
 			System.out.println("Unrecognized Message");
 			break;
@@ -72,26 +71,34 @@ public class PeerNode extends Node{
 	//================================================================================
 	public static void main(String[] args){
 
-		int port = 0;
-		int threads = 5;
-		
-		if (args.length == 1) {
-			port = Integer.parseInt(args[0]);
-		}
+		String discoveryHost = "";
+		int discoveryPort = 0;
+		int localPort = 0;
+		String nickname = "";
+		int refreshTime = 30;
 
-		else if (args.length == 2){
-			port = Integer.parseInt(args[0]);
-			threads = Integer.parseInt(args[1]);
+		if (args.length >= 3) {
+			discoveryHost = args[0];
+			discoveryPort = Integer.parseInt(args[1]);
+			localPort = Integer.parseInt(args[2]);
+
+			if (args.length >= 4) {
+				nickname = args[3];
+
+				if (args.length >= 5) {
+					refreshTime = Integer.parseInt(args[4]);
+				}
+			}
 		}
 
 		else {
-			System.out.println("Usage: java node.Worker PORT <THREADS>");
+			System.out.println("Usage: java cs555.dht.node.PeerNode DISCOVERY-NODE DISCOVERY-PORT LOCAL-PORT <HASH> <REFRESH-TIME>");
 			System.exit(1);
 		}
 
 
 		// Create node
-		PeerNode peer = new PeerNode(port,threads);
+		PeerNode peer = new PeerNode(localPort, nickname, refreshTime);
 		peer.initServer();
 
 	}

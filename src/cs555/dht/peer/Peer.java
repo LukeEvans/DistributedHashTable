@@ -5,13 +5,23 @@ public class Peer {
 
 	public String hostname;
 	public int port;
+	public String nickname;
 
-	// Constructor
+	//================================================================================
+	// Constructors
+	//================================================================================
+	public Peer(String host, int p, String n) {
+		hostname = host;
+		port = p;
+		nickname = n;
+	}
+	
 	public Peer(String host, int p) {
 		hostname = host;
 		port = p;
+		nickname = "";
 	}
-
+	
 	//================================================================================
 	// House Keeping
 	//================================================================================
@@ -20,7 +30,9 @@ public class Peer {
 	public boolean equals(Peer other) {
 		if (other.hostname.equalsIgnoreCase(this.hostname)) {
 			if (other.port == this.port) {
-				return true;
+				if (other.nickname.equalsIgnoreCase(this.nickname)){
+					return true;
+				}
 			}
 		}
 
@@ -31,7 +43,7 @@ public class Peer {
 	public String toString() {
 		String s = "";
 
-		s += "[" + hostname + ", " + port + "]";
+		s += "[" + hostname + ", " + port + ", " + nickname + "]";
 
 		return s;
 	}

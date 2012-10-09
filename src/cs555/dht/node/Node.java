@@ -2,13 +2,11 @@ package cs555.dht.node;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.util.ArrayList;
 
 
 import cs555.dht.communications.*;
 import cs555.dht.peer.Peer;
 import cs555.dht.utilities.*;
-import cs555.dht.wireformats.*;
 
 // Main process in the system
 public class Node {
@@ -47,32 +45,6 @@ public class Node {
 		}
 
 		return link;
-	}
-
-	//================================================================================
-	// Send
-	//================================================================================
-	// Send data
-	public void sendPayload(Link link, int number){
-		Payload payload = new Payload(number);
-		link.sendData(payload.marshall());
-	}
-
-	//================================================================================
-	// Broadcast
-	//================================================================================
-	public void broadcastMessage(ArrayList<Peer> nodes, byte[] data, int expectedReply){
-		for (Peer peer : nodes){
-			Link link = connect(peer);
-			link.sendData(data);
-
-			int replyInt = link.waitForIntReply();
-			
-			if (expectedReply != replyInt){
-				System.out.println("Reply Doesn't match");
-				System.exit(1);
-			}
-		}
 	}
 
 	//================================================================================

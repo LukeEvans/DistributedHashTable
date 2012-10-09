@@ -11,12 +11,10 @@ public class Constants {
 	public static final int Election_Message = 5;
 	public static final int Fetch_Request = 6;
 	public static final int Fetch_Response = 7;
-	
-	// URL states
-	public static final int URL_Ready = 5;
-	public static final int URL_Pending = 6;
-	public static final int URL_Complete = 7;
-	
+	public static final int Registration_Request = 8;
+	public static final int Registration_Reply = 9;
+	public static final int lookup_request = 10;
+	public static final int lookup_reply = 11;
 	
 	public static final int Failure = 99;
 	public static final int Success = 100;

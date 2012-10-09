@@ -1,9 +1,5 @@
 package cs555.dht.peer;
 
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 import cs555.dht.utilities.*;
@@ -12,61 +8,13 @@ import cs555.dht.utilities.*;
 public class PeerList {
 
 	ArrayList<Peer> listOfPeers;;
-	String localHost;
-	int locaPort;
-	String filename;
 
 	//================================================================================
 	// Init
 	//================================================================================
-	public PeerList(String file, int p) {
+	public PeerList() {
 		listOfPeers = new ArrayList<Peer>();
-		localHost = Tools.getLocalHostname();
-		locaPort = p;
-		filename = file;
-
-		// Build List
-		buildList();
-
-		// Remove ourselves
-		removeSelf();
 	}
-
-	// Read hosts from file
-	public void buildList(){
-		try{
-			// Open the file that is the first 
-			FileInputStream fstream = new FileInputStream(filename);
-			DataInputStream in = new DataInputStream(fstream);
-			BufferedReader br = new BufferedReader(new InputStreamReader(in));
-
-			String strLine;
-
-			//Read File Line By Line
-			while ((strLine = br.readLine()) != null)   {
-				createPeerFromLine(strLine);
-			}
-			//Close the input stream
-			in.close();
-		}catch (Exception e){//Catch exception if any
-			System.err.println("Error: " + e.getMessage());
-		}
-	}
-
-	// Turn a line of text into a peer
-	public void createPeerFromLine(String line){
-		String[] stringParts = line.split("\\s+");
-		
-		if (stringParts.length == 2){
-			String host = Tools.getHostname(stringParts[0]);
-			int port = Integer.parseInt(stringParts[1]);
-			
-			// Add Peer
-			Peer peer = new Peer(host, port);
-			addPeer(peer);
-		}
-	}
-
 
 	//================================================================================
 	// List manipulation 
@@ -88,8 +36,8 @@ public class PeerList {
 	}
 
 	// Find Peer matching description
-	public Peer findPeer(String host, int port){
-		Peer newPeer = new Peer(host, port);
+	public Peer findPeer(String host, int port, String nickname){
+		Peer newPeer = new Peer(host, port, nickname);
 
 		for (Peer p : listOfPeers){
 			if (newPeer.equals(p)){
@@ -98,16 +46,6 @@ public class PeerList {
 		}
 
 		return null;
-	}
-
-	// Remove self from list
-	public void removeSelf(){
-		Peer self = findPeer(localHost, locaPort);
-		
-		if (self != null){
-			System.out.println("Removing self from peer list: ("+localHost+":"+locaPort+")");
-			removePeer(self);
-		}
 	}
 
 
@@ -142,6 +80,18 @@ public class PeerList {
 	public int size(){
 		return listOfPeers.size();
 	}
+	
+	// Determine if hash is acceptable to add
+	public boolean hashUnique(String hash) {
+		for (Peer p : listOfPeers) {
+			if (p.nickname.equalsIgnoreCase(hash)) {
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
 	//================================================================================
 	// House Keeping
 	//================================================================================

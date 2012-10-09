@@ -4,38 +4,26 @@ import cs555.dht.communications.Link;
 import cs555.dht.peer.PeerList;
 import cs555.dht.utilities.Constants;
 import cs555.dht.utilities.Tools;
-import cs555.dht.wireformats.ElectionMessage;
-import cs555.dht.wireformats.FetchResponse;
 
 public class DiscoveryNode extends Node{
 	
 	PeerList peerList;
-	
-	String linkFile;
-	String slaveFile;
 	int maxDepth;
 	
 	//================================================================================
 	// Constructor
 	//================================================================================
-	public DiscoveryNode(PeerList list, int port,String lf, String sf, int md){
+	public DiscoveryNode(PeerList list, int port){
 		super(port);
 		
 		peerList = list;
-		linkFile = lf;
-		slaveFile = sf;
-		maxDepth = md;
-		
 	}
 	
 	
 	//================================================================================
 	// Send
 	//================================================================================
-	public void broadcastElection(){
-		ElectionMessage electionMsg = new ElectionMessage(serverPort, Tools.getLocalHostname());
-		broadcastMessage(peerList.getAllPeers(), electionMsg.marshall(),Constants.Election_Message);
-	}
+	
 
 	
 	//================================================================================
@@ -46,12 +34,14 @@ public class DiscoveryNode extends Node{
 		int messageType = Tools.getMessageType(bytes);
 		
 		switch (messageType) {
-		case Constants.Fetch_Response:
+		
+		case Constants.Registration_Request:
+
+			// If peer's id collides, return a failure message
 			
-			FetchResponse response = new FetchResponse();
-			response.unmarshall(bytes);
+			// Get a random peer out of the peer list
 			
-			System.out.println("Got: " + response);
+			// Send peer back through link
 			
 			break;
 
@@ -71,33 +61,22 @@ public class DiscoveryNode extends Node{
 	public static void main(String[] args){
 
 		int port = 0;
-		int maxDepth = 5;
-		String linkFile = "";
-		String slaveFile = "";
-
-		if (args.length == 3) {
+		
+		if (args.length == 1) {
 			port = Integer.parseInt(args[0]);
-			linkFile = args[1];
-			slaveFile = args[2];
+			
 		}
-
-		else if (args.length == 4){
-			port = Integer.parseInt(args[0]);
-			linkFile = args[1];
-			slaveFile = args[2];
-			maxDepth = Integer.parseInt(args[3]);
-		}
-
+		
 		else {
-			System.out.println("Usage: java node.NodeManager PORT LINK-FILE SLAVE-FILE <DEPTH>");
+			System.out.println("Usage: java cs555.dht.node.Discovery PORT");
 			System.exit(1);
 		}
 
 		// Create peer list
-		PeerList peerList = new PeerList(slaveFile, port);
+		PeerList peerList = new PeerList();
 
 		// Create node
-		DiscoveryNode manager = new  DiscoveryNode(peerList, port, linkFile, slaveFile, maxDepth);
+		DiscoveryNode manager = new  DiscoveryNode(peerList, port);
 		manager.initServer();
 		
 	}
