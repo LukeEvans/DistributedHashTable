@@ -6,17 +6,18 @@ public class Constants {
 	// Message types
 	public static final int Payload = 1;
 	public static final int Verification = 2;
-	public static final int Node_Results = 3;
-	public static final int Node_Complete = 4;
-	public static final int Election_Message = 5;
-	public static final int Fetch_Request = 6;
-	public static final int Fetch_Response = 7;
+	public static final int Predesessor_Request = 3;
+	public static final int Predesessor_Response = 4;
+	public static final int Predessessor_Election = 5;
+	public static final int Deregister_Request = 6;
+	public static final int Deregister_Response = 7;
 	public static final int Registration_Request = 8;
 	public static final int Registration_Reply = 9;
 	public static final int lookup_request = 10;
 	public static final int lookup_reply = 11;
 	public static final int store_request = 12;
 	
+	// Flags
 	public static final int Failure = 99;
 	public static final int Success = 100;
 	

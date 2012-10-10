@@ -134,7 +134,7 @@ public class LookupRequest{
 	public String toString(){
 		String s = "";
 		
-		s += "Peer: " + hostName + ":" + port + ", " + nickName + " resolving :" + resolveString + "\n";
+		s += "Peer: " + hostName + ":" + port + ", " + nickName + " resolving :" + resolveString + " " + hopCount + "\n";
 		
 		return s;
 	}
