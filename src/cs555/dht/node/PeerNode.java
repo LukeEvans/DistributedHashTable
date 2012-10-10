@@ -4,6 +4,7 @@ import cs555.dht.communications.Link;
 import cs555.dht.peer.Peer;
 import cs555.dht.state.State;
 import cs555.dht.utilities.*;
+import cs555.dht.wireformats.LookupRequest;
 import cs555.dht.wireformats.RegisterRequest;
 import cs555.dht.wireformats.RegisterResponse;
 
@@ -12,7 +13,6 @@ public class PeerNode extends Node{
 	int port;
 	int hashSpace;
 	Link managerLink;
-	Link accessPoint;
 	int refreshTime;
 	String nickname;
 	String hostname;
@@ -34,7 +34,6 @@ public class PeerNode extends Node{
 		}
 
 		managerLink = null;
-		accessPoint = null;
 		
 		state = new State(s);
 		hashSpace = s;
@@ -75,7 +74,10 @@ public class PeerNode extends Node{
 		
 		// Otherwise send lookup request to our access point
 		else {
-			
+			LookupRequest lookupReq = new LookupRequest(hostname, port, nickname, nickname);
+			Peer poc = new Peer(accessPoint.hostName, accessPoint.port, accessPoint.nickName);
+			Link accessLink = connect(poc);
+			accessLink.sendData(lookupReq.marshall());
 		}
 	}
 	
@@ -93,6 +95,11 @@ public class PeerNode extends Node{
 
 			break;
 
+		case Constants.lookup_reply:
+			
+			
+			break;
+			
 		default:
 			System.out.println("Unrecognized Message");
 			break;

@@ -1,9 +1,13 @@
 package cs555.dht.node;
 
 import cs555.dht.communications.Link;
+import cs555.dht.peer.Peer;
 import cs555.dht.peer.PeerList;
 import cs555.dht.utilities.Constants;
 import cs555.dht.utilities.Tools;
+import cs555.dht.wireformats.RegisterRequest;
+import cs555.dht.wireformats.RegisterResponse;
+import cs555.dht.wireformats.Verification;
 
 public class DiscoveryNode extends Node{
 	
@@ -37,11 +41,24 @@ public class DiscoveryNode extends Node{
 		
 		case Constants.Registration_Request:
 
+			RegisterRequest rreq = new RegisterRequest();
+			rreq.unmarshall(bytes);
+			
 			// If peer's id collides, return a failure message
+			if (peerList.hashUnique(rreq.nickName)) {
+				Verification failure = new Verification(Constants.Failure);
+				l.sendData(failure.marshall());
+				break;
+			}
 			
-			// Get a random peer out of the peer list
+			// Return a random peer
+			Peer returnPeer = peerList.getNextPeer();
+			RegisterResponse rresp = new RegisterResponse(returnPeer.hostname, returnPeer.port, returnPeer.nickname);
+			l.sendData(rresp.marshall());
 			
-			// Send peer back through link
+			// Add peer to list
+			Peer addPeer = new Peer(rreq.hostName, rreq.port, rreq.nickName);
+			peerList.addPeer(addPeer);
 			
 			break;
 
