@@ -1,18 +1,17 @@
 package cs555.dht.state;
 
 import cs555.dht.peer.Peer;
+import cs555.dht.utilities.Constants;
 
 public class FingerTable {
 	
-	int idSpace;
 	Peer table[];
 	
 	//================================================================================
 	// Constructor
 	//================================================================================
-	public FingerTable(int s) {
-		idSpace = s;
-		table = new Peer[idSpace];
+	public FingerTable() {
+		table = new Peer[Constants.Id_Space];
 	}
 	
 	

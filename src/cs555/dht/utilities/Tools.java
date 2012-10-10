@@ -156,12 +156,13 @@ public class Tools {
 	}
 
 	// Generates hash
-	public static String generateHash(int space) {
+	public static String generateHash() {
 		return "AAAAA";
 	}
 	
 	// Generate hash of file
-	public static String generateHash(String fname, int space) {
+	public static String generateHash(String fname) {
+		//int space = Constants.Id_Space;
 		return "BBBBBB";
 	}
 	

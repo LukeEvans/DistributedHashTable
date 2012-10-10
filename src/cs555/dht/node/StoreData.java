@@ -23,7 +23,7 @@ public class StoreData extends Node {
 		idSpace = s;
 
 		if (filehash.equalsIgnoreCase("")) {
-			filehash = Tools.generateHash(filename, idSpace);
+			filehash = Tools.generateHash(filename);
 		}
 	}
 
@@ -61,7 +61,7 @@ public class StoreData extends Node {
 			candidateLink.sendData(sendReq.marshall());
 			
 			if (candidateLink.waitForIntReply() == Constants.Success) {
-				// Send data items to candidate
+				// Send data item to candidate
 			}
 			
 			break;

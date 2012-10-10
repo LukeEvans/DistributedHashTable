@@ -22,4 +22,10 @@ public class Constants {
 	
 	// Message sizes
 	public static final int LEN_BYTES = 3072;
+	
+	// ID space of DHT
+	public static final int Id_Space = 16;
+	
+	// Base path for data to be stored
+	public static final String base_path = "/tmp/evansl/dhtData/";
 }

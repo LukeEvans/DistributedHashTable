@@ -11,7 +11,6 @@ import cs555.dht.wireformats.RegisterResponse;
 public class PeerNode extends Node{
 
 	int port;
-	int hashSpace;
 	Link managerLink;
 	int refreshTime;
 	String nickname;
@@ -22,7 +21,7 @@ public class PeerNode extends Node{
 	//================================================================================
 	// Constructor
 	//================================================================================
-	public PeerNode(int p, String n, int r, int s){
+	public PeerNode(int p, String n, int r){
 		super(p);
 
 		port = p;
@@ -30,13 +29,12 @@ public class PeerNode extends Node{
 		refreshTime = r;
 
 		if (nickname.equalsIgnoreCase("")) {
-			nickname = Tools.generateHash(s);
+			nickname = Tools.generateHash();
 		}
 
 		managerLink = null;
 		
-		state = new State(s);
-		hashSpace = s;
+		state = new State();
 		hostname = Tools.getLocalHostname();
 	}
 
@@ -58,7 +56,7 @@ public class PeerNode extends Node{
 		
 		// Keep sending until we are able to enter
 		while (managerLink.waitForIntReply() == Constants.Failure) {
-			nickname = Tools.generateHash(hashSpace);
+			nickname = Tools.generateHash();
 			regiserReq = new RegisterRequest(hostname, port, nickname);
 		}
 		
@@ -119,7 +117,6 @@ public class PeerNode extends Node{
 		int localPort = 0;
 		String nickname = "";
 		int refreshTime = 30;
-		int idSpace = 16;
 
 		if (args.length >= 3) {
 			discoveryHost = args[0];
@@ -132,9 +129,6 @@ public class PeerNode extends Node{
 				if (args.length >= 5) {
 					refreshTime = Integer.parseInt(args[4]);
 					
-					if (args.length >= 6) {
-						idSpace = Integer.parseInt(args[5]);
-					}
 				}
 			}
 		}
@@ -146,7 +140,7 @@ public class PeerNode extends Node{
 
 
 		// Create node
-		PeerNode peer = new PeerNode(localPort, nickname, refreshTime, idSpace);
+		PeerNode peer = new PeerNode(localPort, nickname, refreshTime);
 		
 		// Enter DHT
 		peer.enterDHT(discoveryHost, discoveryPort);

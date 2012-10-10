@@ -5,19 +5,17 @@ import cs555.dht.peer.*;
 public class State {
 	Peer successor;
 	Peer predecessor;
-	int idSpace;
 	
 	FingerTable fingerTable;
 	
 	//================================================================================
 	// Constructors
 	//================================================================================
-	public State(int s){
+	public State(){
 		successor = null;
 		predecessor = null;
-		idSpace = s;
 		
-		fingerTable = new FingerTable(idSpace);
+		fingerTable = new FingerTable();
 	}
 	
 	
