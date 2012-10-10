@@ -11,6 +11,8 @@ public class LookupRequest{
 	
 	public int type; // 4
 	
+	public int hopCount; 
+	
 	public int hostLength; // 4 
 	public String hostName; // hostLength
 	
@@ -36,6 +38,8 @@ public class LookupRequest{
 	
 	public void init(String h, int p, String n, String r){
 		type = Constants.lookup_request;
+		hopCount = 0;
+		
 		hostLength = h.length();
 		hostName = h;
 		
@@ -60,6 +64,9 @@ public class LookupRequest{
 		
 		// Size
 		bbuff.putInt(size);
+		
+		// Hop count 
+		bbuff.putInt(hopCount);
 		
 		// type
 		bbuff.putInt(type);
@@ -92,6 +99,9 @@ public class LookupRequest{
 		// Size
 		size = bbuff.getInt();
 			
+		// Hopcount 
+		hopCount = bbuff.getInt();
+		
 		// type
 		type = bbuff.getInt();
 		

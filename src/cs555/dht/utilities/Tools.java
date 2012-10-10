@@ -160,6 +160,10 @@ public class Tools {
 		return "AAAAA";
 	}
 	
+	// Generate hash of file
+	public static String generateHash(String fname, int space) {
+		return "BBBBBB";
+	}
 	
 	//================================================================================
 	// Error Handling
