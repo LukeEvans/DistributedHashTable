@@ -23,4 +23,27 @@ public class DataItem {
 	}
 	
 	
+	//================================================================================
+	// House keeping
+	//================================================================================
+	public String toString() {
+		String s = "";
+		
+		s += basepath + filename + " : " + filehash;
+		
+		return s;
+	}
+	
+	// Override equals method
+	public boolean equals(DataItem other) {
+		if (this.filename.equalsIgnoreCase(other.filename)) {
+			if (this.filehash.equalsIgnoreCase(other.filehash)) {
+				if (this.basepath.equals(other.basepath)) {
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
 }
