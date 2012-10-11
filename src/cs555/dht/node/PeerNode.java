@@ -13,12 +13,14 @@ import cs555.dht.wireformats.RegisterResponse;
 
 public class PeerNode extends Node{
 
-	int port;
+	
 	Link managerLink;
 	int refreshTime;
 	String nickname;
-	int id;
-	String hostname;
+	
+	public String hostname;
+	public int port;
+	public int id;
 
 	State state;
 
@@ -40,7 +42,7 @@ public class PeerNode extends Node{
 
 		managerLink = null;
 
-		state = new State(id);
+		state = new State(id, this);
 		hostname = Tools.getLocalHostname();
 
 		refreshThread = new RefreshThread(this, refreshTime);
@@ -69,6 +71,7 @@ public class PeerNode extends Node{
 			managerLink.sendData(regiserReq.marshall());
 		}
 
+		// Wait for data from Discovery
 		byte[] randomNodeData = managerLink.waitForData();
 		int messageType = Tools.getMessageType(randomNodeData);
 
@@ -76,7 +79,7 @@ public class PeerNode extends Node{
 		case Constants.Registration_Reply: 
 
 			RegisterResponse accessPoint = new RegisterResponse();
-			accessPoint.unmarshall(managerLink.waitForData());
+			accessPoint.unmarshall(randomNodeData);
 
 			LookupRequest lookupReq = new LookupRequest(hostname, port, id, id);
 			Peer poc = new Peer(accessPoint.hostName, accessPoint.port, accessPoint.id);
@@ -101,7 +104,6 @@ public class PeerNode extends Node{
 			System.out.println("Could not get access point from Discovery");
 			break;
 		}	
-
 		
 	}
 
@@ -159,10 +161,17 @@ public class PeerNode extends Node{
 
 			System.out.println("Received Reply : " + reply);
 
-			// Set the replier to our new successor
+			// If the reply resolves our ID, we found our sucessor
+			if (reply.responseResolves(id)) {
+				// Set the replier to our new successor
 
-			// Tell the process who replied that we are now they're new predecessor
+				// Tell the process who replied that we are now they're new predecessor	
+			}
 
+			else {
+				System.out.println("Response does not resolve my ID");
+			}
+			
 			break;
 
 		default:

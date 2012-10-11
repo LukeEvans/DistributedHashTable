@@ -1,21 +1,24 @@
 package cs555.dht.state;
 
+import cs555.dht.node.PeerNode;
 import cs555.dht.peer.*;
 
 public class State {
 	Peer successor;
 	Peer predecessor;
 	int thisID;
+	PeerNode myself;
 	
 	FingerTable fingerTable;
 	
 	//================================================================================
 	// Constructors
 	//================================================================================
-	public State(int h){
+	public State(int h, PeerNode p){
 		successor = null;
 		predecessor = null;
 		thisID = h;
+		myself = p;
 		
 		fingerTable = new FingerTable();
 	}
@@ -30,6 +33,16 @@ public class State {
 	
 	public void addPredecessor(Peer p) {
 		predecessor = p;
+	}
+	
+	// Set all values to self
+	public void firstToArrive() {
+		Peer thisPeer = new Peer(myself.hostname, myself.port, myself.id);
+		addPredecessor(thisPeer);
+		addSucessor(thisPeer);
+		
+		// Add thisPeer as all values in FT
+		
 	}
 	
 	//================================================================================

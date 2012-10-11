@@ -5,6 +5,7 @@ import cs555.dht.peer.Peer;
 import cs555.dht.peer.PeerList;
 import cs555.dht.utilities.Constants;
 import cs555.dht.utilities.Tools;
+import cs555.dht.wireformats.DeregisterRequest;
 import cs555.dht.wireformats.Payload;
 import cs555.dht.wireformats.RegisterRequest;
 import cs555.dht.wireformats.RegisterResponse;
@@ -40,7 +41,7 @@ public class DiscoveryNode extends Node{
 			rreq.unmarshall(bytes);
 	
 			// If peer's id collides, return a failure message
-			if (peerList.hashUnique(rreq.id)) {
+			if (!peerList.hashUnique(rreq.id)) {
 				Verification failure = new Verification(Constants.Failure);
 				l.sendData(failure.marshall());
 				break;
@@ -66,8 +67,17 @@ public class DiscoveryNode extends Node{
 			
 			break;
 
-		default:
+		case Constants.Deregister_Request:
+			DeregisterRequest deregisterRequest = new DeregisterRequest();
+			deregisterRequest.unmarshall(bytes);
 			
+			// Remove peer
+			Peer removePeer = new Peer(deregisterRequest.hostName, deregisterRequest.port, deregisterRequest.id);
+			peerList.removePeer(removePeer);
+			
+			break;
+			
+		default:
 			System.out.println("Unrecognized Message");
 			break;
 		}
