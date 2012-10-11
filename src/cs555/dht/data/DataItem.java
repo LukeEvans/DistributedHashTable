@@ -6,18 +6,18 @@ import cs555.dht.utilities.Tools;
 public class DataItem {
 
 	public String filename;
-	public String filehash;
+	public int filehash;
 	public String basepath;
 	
 	//================================================================================
 	// Constructor
 	//================================================================================
-	public DataItem(String fname, String fhash) {
+	public DataItem(String fname, int fhash) {
 		filename = fname;
 		filehash = fhash;
 		basepath = Constants.base_path;
 		
-		if (filehash.equalsIgnoreCase("")) {
+		if (filehash == -1) {
 			filehash = Tools.generateHash(filename);
 		}
 	}
@@ -37,7 +37,7 @@ public class DataItem {
 	// Override equals method
 	public boolean equals(DataItem other) {
 		if (this.filename.equalsIgnoreCase(other.filename)) {
-			if (this.filehash.equalsIgnoreCase(other.filehash)) {
+			if (this.filehash == other.filehash) {
 				if (this.basepath.equals(other.basepath)) {
 					return true;
 				}

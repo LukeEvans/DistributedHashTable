@@ -17,6 +17,7 @@ public class PeerNode extends Node{
 	Link managerLink;
 	int refreshTime;
 	String nickname;
+	int id;
 	String hostname;
 
 	State state;
@@ -26,20 +27,20 @@ public class PeerNode extends Node{
 	//================================================================================
 	// Constructor
 	//================================================================================
-	public PeerNode(int p, String n, int r){
+	public PeerNode(int p, int i, int r){
 		super(p);
 
 		port = p;
-		nickname = n;
+		id = i;
 		refreshTime = r;
 
-		if (nickname.equalsIgnoreCase("")) {
-			nickname = Tools.generateHash();
+		if (id == -1) {
+			id = Tools.generateHash();
 		}
 
 		managerLink = null;
 
-		state = new State(nickname);
+		state = new State(id);
 		hostname = Tools.getLocalHostname();
 
 		refreshThread = new RefreshThread(this, refreshTime);
@@ -58,13 +59,13 @@ public class PeerNode extends Node{
 
 	public void enterDHT(String dHost, int dPort) {
 		managerLink = connect(new Peer(dHost, dPort));
-		RegisterRequest regiserReq = new RegisterRequest(hostname, port, nickname);
+		RegisterRequest regiserReq = new RegisterRequest(hostname, port, id);
 		managerLink.sendData(regiserReq.marshall());
 
 		// Keep sending until we are able to enter
 		while (managerLink.waitForIntReply() == Constants.Failure) {
-			nickname = Tools.generateHash();
-			regiserReq = new RegisterRequest(hostname, port, nickname);
+			id = Tools.generateHash();
+			regiserReq = new RegisterRequest(hostname, port, id);
 			managerLink.sendData(regiserReq.marshall());
 		}
 
@@ -77,8 +78,8 @@ public class PeerNode extends Node{
 			RegisterResponse accessPoint = new RegisterResponse();
 			accessPoint.unmarshall(managerLink.waitForData());
 
-			LookupRequest lookupReq = new LookupRequest(hostname, port, nickname, nickname);
-			Peer poc = new Peer(accessPoint.hostName, accessPoint.port, accessPoint.nickName);
+			LookupRequest lookupReq = new LookupRequest(hostname, port, id, id);
+			Peer poc = new Peer(accessPoint.hostName, accessPoint.port, accessPoint.id);
 			Link accessLink = connect(poc);
 			accessLink.sendData(lookupReq.marshall());
 			
@@ -89,12 +90,9 @@ public class PeerNode extends Node{
 			response.unmarshall(randomNodeData);
 
 			// If we heard back that we're the first node, modify state accordingly
-			if (response.number == Constants.Null_Peer) {
-				Peer self = new Peer(hostname, port, nickname);
-				state.addPredecessor(self);
-				state.addSucessor(self);
-				
+			if (response.number == Constants.Null_Peer) {				
 				// Add ourselves as all entries in FT
+				// state.firstToArrive();
 			}
 
 			break;
@@ -131,15 +129,15 @@ public class PeerNode extends Node{
 			System.out.println("Recieved Request : " + lookup);
 
 			// Info about the lookup
-			String resolveString = lookup.resolveString;
+			int resolveID = lookup.resolveID;
 			String requesterHost = lookup.hostName;
 			int requesterPort = lookup.port;
-			String requesterHash = lookup.nickName;
+			int requesterID = lookup.id;
 
 			// If we are the target, handle it
-			if (state.itemIsMine(resolveString)) {
-				LookupResponse response = new LookupResponse(hostname, port, nickname, resolveString);
-				Peer requester = new Peer(requesterHost, requesterPort, requesterHash);
+			if (state.itemIsMine(resolveID)) {
+				LookupResponse response = new LookupResponse(hostname, port, id, resolveID);
+				Peer requester = new Peer(requesterHost, requesterPort, requesterID);
 				Link requesterLink = connect(requester);
 
 				requesterLink.sendData(response.marshall());
@@ -147,7 +145,7 @@ public class PeerNode extends Node{
 
 			// Else, pass it along
 			else {
-				Link nextHop = connect(state.getNexClosestPeer(resolveString));
+				Link nextHop = connect(state.getNexClosestPeer(resolveID));
 				lookup.hopCount++;
 				nextHop.sendData(lookup.marshall());
 			}
@@ -184,7 +182,7 @@ public class PeerNode extends Node{
 		String discoveryHost = "";
 		int discoveryPort = 0;
 		int localPort = 0;
-		String nickname = "";
+		int id = -1;
 		int refreshTime = 30;
 
 		if (args.length >= 3) {
@@ -193,7 +191,7 @@ public class PeerNode extends Node{
 			localPort = Integer.parseInt(args[2]);
 
 			if (args.length >= 4) {
-				nickname = args[3];
+				id = Integer.parseInt(args[3]);
 
 				if (args.length >= 5) {
 					refreshTime = Integer.parseInt(args[4]);
@@ -208,7 +206,7 @@ public class PeerNode extends Node{
 		}
 
 		// Create node
-		PeerNode peer = new PeerNode(localPort, nickname, refreshTime);
+		PeerNode peer = new PeerNode(localPort, id, refreshTime);
 
 		// Enter DHT
 		peer.enterDHT(discoveryHost, discoveryPort);

@@ -27,7 +27,7 @@ public class DataList {
 	// Accessor methods
 	//================================================================================
 	// Returns a list of data items >= to id
-	public ArrayList<DataItem> subsetToMove(String id) {
+	public ArrayList<DataItem> subsetToMove(int id) {
 		return null;
 	}
 	

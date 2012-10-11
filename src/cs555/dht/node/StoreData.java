@@ -11,10 +11,10 @@ public class StoreData extends Node {
 	String hostName;
 	int port;
 	String filename;
-	String filehash;
+	int filehash;
 	int idSpace;
 
-	public StoreData(int p, String fname, String fhash, int s) {
+	public StoreData(int p, String fname, int fhash, int s) {
 		super(p);
 		hostName = Tools.getLocalHostname();
 		port = p;
@@ -22,7 +22,7 @@ public class StoreData extends Node {
 		filehash = fhash;
 		idSpace = s;
 
-		if (filehash.equalsIgnoreCase("")) {
+		if (filehash == -1) {
 			filehash = Tools.generateHash(filename);
 		}
 	}
@@ -36,7 +36,7 @@ public class StoreData extends Node {
 
 	public void initLookup(String dHost, int dPort) {
 		Link managerLink = connect(new Peer(dHost, dPort));
-		LookupRequest req = new LookupRequest(hostName, port, filename, filehash);
+		LookupRequest req = new LookupRequest(hostName, port, filehash, filehash);
 		managerLink.sendData(req.marshall());
 	}
 
@@ -60,7 +60,7 @@ public class StoreData extends Node {
 			Payload sendReq = new Payload(Constants.store_request);
 			candidateLink.sendData(sendReq.marshall());
 			
-			if (candidateLink.waitForIntReply() == Constants.Success) {
+			if (candidateLink.waitForIntReply() == Constants.Continue) {
 				// Send data item to candidate
 			}
 			
@@ -83,7 +83,7 @@ public class StoreData extends Node {
 		int discoveryPort = 0;
 		int localPort = 0;
 		String fileName = "";
-		String fileHash = "";
+		int fileHash = -1;
 		int idSpace = 16;
 
 		if (args.length >= 4) {
@@ -93,7 +93,7 @@ public class StoreData extends Node {
 			fileName = args[3];
 
 			if (args.length >= 5) {
-				fileHash = args[4];
+				fileHash = Integer.parseInt(args[4]);
 
 				if (args.length >= 6) {
 					idSpace = Integer.parseInt(args[5]);
@@ -103,7 +103,7 @@ public class StoreData extends Node {
 		}
 
 		else {
-			System.out.println("Usage: java cs555.dht.node.StoreData DISCOVERY-NODE DISCOVERY-PORT LOCAL-PORT FILE-NAME <CUSTOM-HASH> <ID-Space>");
+			System.out.println("Usage: java cs555.dht.node.StoreData DISCOVERY-NODE DISCOVERY-PORT LOCAL-PORT FILE-NAME <CUSTOM-HASH>");
 			System.exit(1);
 		}
 

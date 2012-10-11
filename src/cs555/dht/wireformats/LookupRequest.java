@@ -11,32 +11,30 @@ public class LookupRequest{
 	
 	public int type; // 4
 	
-	public int hopCount; 
+	public int hopCount; // 4
 	
 	public int hostLength; // 4 
 	public String hostName; // hostLength
 	
 	public int port; // 4
 	
-	public int nickNameLength; // 4
-	public String nickName; // nickNameLength
+	public int id; // 4
 	
-	public int resolveLength; // 4
-	public String resolveString; // resolveLength
+	public int resolveID; // 4
 	
 	
 	//================================================================================
 	// Constructors
 	//================================================================================
-	public LookupRequest(String h, int p, String n, String r){
-		init(h, p, n, r);
+	public LookupRequest(String h, int p, int i, int r){
+		init(h, p, i, r);
 	}
 	
 	public LookupRequest(){
-		init("",0,"","");
+		init("",0,-1,-1);
 	}
 	
-	public void init(String h, int p, String n, String r){
+	public void init(String h, int p, int i, int r){
 		type = Constants.lookup_request;
 		hopCount = 0;
 		
@@ -45,13 +43,11 @@ public class LookupRequest{
 		
 		port = p;
 		
-		nickNameLength = n.length();
-		nickName = n;
+		id = i;
 		
-		resolveLength = r.length();
-		resolveString = r;
+		resolveID = r;
 		
-		size = 4 + 4 + hostLength + 4 + 4 + nickNameLength + 4 + resolveLength;
+		size = 4 + 4 + 4 + hostLength + 4 + 4 + 4;
 	}
 	
 	
@@ -78,13 +74,11 @@ public class LookupRequest{
 		// Port 
 		bbuff.putInt(port);
 		
-		// nickname length and nickname
-		bbuff.putInt(nickNameLength);
-		bbuff.put(Tools.convertToBytes(nickName));
+		// ID
+		bbuff.putInt(id);
 		
-		// Resolve length and resolve
-		bbuff.putInt(resolveLength);
-		bbuff.put(Tools.convertToBytes(resolveString));
+		// Resolve ID
+		bbuff.putInt(resolveID);
 		
 		return bytes;
 	}
@@ -114,17 +108,11 @@ public class LookupRequest{
 		// Port
 		port = bbuff.getInt();
 		
-		// Nickname length and nickname
-		nickNameLength = bbuff.getInt();
-		byte[] nickNameBytes = new byte[nickNameLength];
-		bbuff.get(nickNameBytes);
-		nickName = new String(nickNameBytes,0,nickNameLength);
+		// ID
+		id = bbuff.getInt();
 		
-		// Resolve length and resolve
-		resolveLength = bbuff.getInt();
-		byte[] resolveBytes = new byte[resolveLength];
-		bbuff.get(resolveBytes);
-		resolveString = new String(resolveBytes,0,resolveLength);
+		// Resolve ID
+		resolveID = bbuff.getInt();
 	}
 	
 	//================================================================================
@@ -134,17 +122,23 @@ public class LookupRequest{
 	public String toString(){
 		String s = "";
 		
-		s += "Peer: " + hostName + ":" + port + ", " + nickName + " resolving :" + resolveString + " " + hopCount + "\n";
+		s += "Peer: " + hostName + ":" + port + ", " + id + " resolving :" + resolveID + " " + hopCount + "\n";
 		
 		return s;
 	}
 	
 	// Override the equals method
 	public boolean equals(LookupRequest other) {
-		if (this.resolveString.equalsIgnoreCase(other.resolveString)){
-			return true;
+		if (this.hostName.equalsIgnoreCase(other.hostName)){
+			if (this.port == other.port) {
+				if (this.resolveID == other.resolveID) {
+					return true;
+				}
+			}
+			
 		}
 		
 		return false;
 	}
+	
 }

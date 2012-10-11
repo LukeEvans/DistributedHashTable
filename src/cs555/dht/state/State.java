@@ -5,17 +5,17 @@ import cs555.dht.peer.*;
 public class State {
 	Peer successor;
 	Peer predecessor;
-	String hash;
+	int thisID;
 	
 	FingerTable fingerTable;
 	
 	//================================================================================
 	// Constructors
 	//================================================================================
-	public State(String h){
+	public State(int h){
 		successor = null;
 		predecessor = null;
-		hash = h;
+		thisID = h;
 		
 		fingerTable = new FingerTable();
 	}
@@ -42,12 +42,12 @@ public class State {
 	//================================================================================
 	// Resolving
 	//================================================================================
-	public boolean itemIsMine(String h) {
+	public boolean itemIsMine(int h) {
 		return true;
 	}
 	
 	// Get the next closest peer to this id from finger table
-	public Peer getNexClosestPeer(String h) {
+	public Peer getNexClosestPeer(int h) {
 		return fingerTable.getNextClosest(h);
 	}
 	

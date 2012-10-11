@@ -13,7 +13,6 @@ import cs555.dht.wireformats.Verification;
 public class DiscoveryNode extends Node{
 	
 	PeerList peerList;
-	int maxDepth;
 	
 	//================================================================================
 	// Constructor
@@ -23,11 +22,6 @@ public class DiscoveryNode extends Node{
 		
 		peerList = list;
 	}
-	
-	
-	//================================================================================
-	// Send
-	//================================================================================
 	
 
 	
@@ -46,7 +40,7 @@ public class DiscoveryNode extends Node{
 			rreq.unmarshall(bytes);
 	
 			// If peer's id collides, return a failure message
-			if (peerList.hashUnique(rreq.nickName)) {
+			if (peerList.hashUnique(rreq.id)) {
 				Verification failure = new Verification(Constants.Failure);
 				l.sendData(failure.marshall());
 				break;
@@ -63,11 +57,11 @@ public class DiscoveryNode extends Node{
 			}
 			
 			// Else, we have a valid peer to return
-			RegisterResponse rresp = new RegisterResponse(returnPeer.hostname, returnPeer.port, returnPeer.nickname);
+			RegisterResponse rresp = new RegisterResponse(returnPeer.hostname, returnPeer.port, returnPeer.id);
 			l.sendData(rresp.marshall());
 			
 			// Add peer to list
-			Peer addPeer = new Peer(rreq.hostName, rreq.port, rreq.nickName);
+			Peer addPeer = new Peer(rreq.hostName, rreq.port, rreq.id);
 			peerList.addPeer(addPeer);
 			
 			break;

@@ -36,8 +36,8 @@ public class PeerList {
 	}
 
 	// Find Peer matching description
-	public Peer findPeer(String host, int port, String nickname){
-		Peer newPeer = new Peer(host, port, nickname);
+	public Peer findPeer(String host, int port, int id){
+		Peer newPeer = new Peer(host, port, id);
 
 		for (Peer p : listOfPeers){
 			if (newPeer.equals(p)){
@@ -82,9 +82,9 @@ public class PeerList {
 	}
 	
 	// Determine if hash is acceptable to add
-	public boolean hashUnique(String hash) {
+	public boolean hashUnique(int hash) {
 		for (Peer p : listOfPeers) {
-			if (p.nickname.equalsIgnoreCase(hash)) {
+			if (p.id == hash) {
 				return false;
 			}
 		}

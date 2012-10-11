@@ -18,7 +18,7 @@ public class FingerTable {
 	//================================================================================
 	// Resolve
 	//================================================================================
-	public Peer getNextClosest(String s) {
+	public Peer getNextClosest(int h) {
 		return null;
 	}
 	

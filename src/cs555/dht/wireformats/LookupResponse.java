@@ -7,22 +7,22 @@ public class LookupResponse extends LookupRequest{
 	//================================================================================
 	// Overridden Constructors
 	//================================================================================
-	public LookupResponse(String h, int p, String n, String r){
-		super.init(h, p, n, r);
+	public LookupResponse(String h, int p, int i, int r){
+		super.init(h, p, i, r);
 		type = Constants.lookup_reply;
 		
 	}
 	
 	
 	public LookupResponse(){
-		super.init("", 0, "","");
+		super.init("", 0, -1,-1);
 		type = Constants.lookup_reply;
 	}
 	
 	//================================================================================
 	// Verification
 	//================================================================================
-	public boolean responseResolves(String n) {
-		return n.equalsIgnoreCase(resolveString);
+	public boolean responseResolves(int n) {
+		return n == resolveID;
 	}
 }

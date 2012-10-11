@@ -19,6 +19,7 @@ public class Constants {
 	public static final int Null_Peer = 13;
 	
 	// Flags
+	public static final int Continue = 98;
 	public static final int Failure = 99;
 	public static final int Success = 100;
 	
