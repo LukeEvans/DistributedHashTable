@@ -16,6 +16,7 @@ public class Constants {
 	public static final int lookup_request = 10;
 	public static final int lookup_reply = 11;
 	public static final int store_request = 12;
+	public static final int Null_Peer = 13;
 	
 	// Flags
 	public static final int Failure = 99;

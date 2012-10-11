@@ -5,6 +5,7 @@ import cs555.dht.peer.Peer;
 import cs555.dht.peer.PeerList;
 import cs555.dht.utilities.Constants;
 import cs555.dht.utilities.Tools;
+import cs555.dht.wireformats.Payload;
 import cs555.dht.wireformats.RegisterRequest;
 import cs555.dht.wireformats.RegisterResponse;
 import cs555.dht.wireformats.Verification;
@@ -43,7 +44,7 @@ public class DiscoveryNode extends Node{
 
 			RegisterRequest rreq = new RegisterRequest();
 			rreq.unmarshall(bytes);
-			
+	
 			// If peer's id collides, return a failure message
 			if (peerList.hashUnique(rreq.nickName)) {
 				Verification failure = new Verification(Constants.Failure);
@@ -53,6 +54,15 @@ public class DiscoveryNode extends Node{
 			
 			// Return a random peer
 			Peer returnPeer = peerList.getNextPeer();
+			
+			// If return peer is null, the requesting node is the first to join. Return null
+			if (returnPeer == null) {
+				Payload nullPeer = new Payload(Constants.Null_Peer);
+				l.sendData(nullPeer.marshall());
+				break;
+			}
+			
+			// Else, we have a valid peer to return
 			RegisterResponse rresp = new RegisterResponse(returnPeer.hostname, returnPeer.port, returnPeer.nickname);
 			l.sendData(rresp.marshall());
 			

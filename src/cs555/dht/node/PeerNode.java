@@ -7,6 +7,7 @@ import cs555.dht.state.State;
 import cs555.dht.utilities.*;
 import cs555.dht.wireformats.LookupRequest;
 import cs555.dht.wireformats.LookupResponse;
+import cs555.dht.wireformats.Payload;
 import cs555.dht.wireformats.RegisterRequest;
 import cs555.dht.wireformats.RegisterResponse;
 
@@ -19,7 +20,7 @@ public class PeerNode extends Node{
 	String hostname;
 
 	State state;
-	
+
 	RefreshThread refreshThread;
 
 	//================================================================================
@@ -40,7 +41,7 @@ public class PeerNode extends Node{
 
 		state = new State(nickname);
 		hostname = Tools.getLocalHostname();
-		
+
 		refreshThread = new RefreshThread(this, refreshTime);
 	}
 
@@ -64,25 +65,46 @@ public class PeerNode extends Node{
 		while (managerLink.waitForIntReply() == Constants.Failure) {
 			nickname = Tools.generateHash();
 			regiserReq = new RegisterRequest(hostname, port, nickname);
+			managerLink.sendData(regiserReq.marshall());
 		}
 
-		RegisterResponse accessPoint = new RegisterResponse();
-		accessPoint.unmarshall(managerLink.waitForData());
+		byte[] randomNodeData = managerLink.waitForData();
+		int messageType = Tools.getMessageType(randomNodeData);
 
-		// If we hear back from Discovery node with our info, we are the first to arrive
-		if (regiserReq.equals(accessPoint)) {
-			Peer self = new Peer(hostname, port, nickname);
-			state.addPredecessor(self);
-			state.addSucessor(self);
-		}
+		switch (messageType) {
+		case Constants.Registration_Reply: 
 
-		// Otherwise send lookup request to our access point
-		else {
+			RegisterResponse accessPoint = new RegisterResponse();
+			accessPoint.unmarshall(managerLink.waitForData());
+
 			LookupRequest lookupReq = new LookupRequest(hostname, port, nickname, nickname);
 			Peer poc = new Peer(accessPoint.hostName, accessPoint.port, accessPoint.nickName);
 			Link accessLink = connect(poc);
 			accessLink.sendData(lookupReq.marshall());
-		}
+			
+			break;
+
+		case Constants.Payload:
+			Payload response = new Payload();
+			response.unmarshall(randomNodeData);
+
+			// If we heard back that we're the first node, modify state accordingly
+			if (response.number == Constants.Null_Peer) {
+				Peer self = new Peer(hostname, port, nickname);
+				state.addPredecessor(self);
+				state.addSucessor(self);
+				
+				// Add ourselves as all entries in FT
+			}
+
+			break;
+
+		default:
+			System.out.println("Could not get access point from Discovery");
+			break;
+		}	
+
+		
 	}
 
 	//================================================================================
@@ -105,24 +127,24 @@ public class PeerNode extends Node{
 
 			LookupRequest lookup = new LookupRequest();
 			lookup.unmarshall(bytes);
-			
+
 			System.out.println("Recieved Request : " + lookup);
-			
+
 			// Info about the lookup
 			String resolveString = lookup.resolveString;
 			String requesterHost = lookup.hostName;
 			int requesterPort = lookup.port;
 			String requesterHash = lookup.nickName;
-			
+
 			// If we are the target, handle it
 			if (state.itemIsMine(resolveString)) {
 				LookupResponse response = new LookupResponse(hostname, port, nickname, resolveString);
 				Peer requester = new Peer(requesterHost, requesterPort, requesterHash);
 				Link requesterLink = connect(requester);
-				
+
 				requesterLink.sendData(response.marshall());
 			}
-			
+
 			// Else, pass it along
 			else {
 				Link nextHop = connect(state.getNexClosestPeer(resolveString));
@@ -136,13 +158,13 @@ public class PeerNode extends Node{
 
 			LookupResponse reply = new LookupResponse();
 			reply.unmarshall(bytes);
-			
+
 			System.out.println("Received Reply : " + reply);
-			
+
 			// Set the replier to our new successor
-			
+
 			// Tell the process who replied that we are now they're new predecessor
-			
+
 			break;
 
 		default:
