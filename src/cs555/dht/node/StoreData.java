@@ -36,7 +36,7 @@ public class StoreData extends Node {
 
 	public void initLookup(String dHost, int dPort) {
 		Link managerLink = connect(new Peer(dHost, dPort));
-		LookupRequest req = new LookupRequest(hostName, port, filehash, filehash, 0);
+		LookupRequest req = new LookupRequest(hostName, port, filehash, filehash, Constants.Store_Lookup);
 		managerLink.sendData(req.marshall());
 	}
 

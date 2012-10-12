@@ -22,7 +22,7 @@ public class State {
 		thisID = h;
 		myself = p;
 		
-		fingerTable = new FingerTable();
+		fingerTable = new FingerTable(thisID);
 	}
 	
 	
@@ -44,7 +44,7 @@ public class State {
 		addSucessor(thisPeer);
 		
 		// Add thisPeer as all values in FT
-		
+		fingerTable.firstToArrive(thisPeer);
 	}
 	
 	//================================================================================

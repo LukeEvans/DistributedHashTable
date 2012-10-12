@@ -162,25 +162,30 @@ public class Tools {
 	public static int generateHash() {
 		// Timestamp
 		long epoch = System.currentTimeMillis()/1000;
+		generateHash(String.valueOf(epoch));
+		
 		return generateHash(String.valueOf(epoch));
+
 	}
 
-	// Generate hash of file
+	// Generate hash of String
 	public static int generateHash(String item) {
 		int bitsToTake = Constants.Id_Space / 4;
+
 		String itemMD5 = md5(item);
 		String partMD5 = "";
-		
+
 		// Take sampling of characters
 		for (int i=itemMD5.length()-1; i>=0; i--) {
-			if (partMD5.length() <= bitsToTake) {
+			if (partMD5.length() < bitsToTake) {
 				if (i % 8 == 0) {
 					partMD5 += itemMD5.charAt(i);
 				}
 			}
 		}
-		
+
 		int hashInt = Integer.parseInt(partMD5, 16);
+		//System.out.println("hash : " + hashInt);
 		return hashInt;
 	}
 
