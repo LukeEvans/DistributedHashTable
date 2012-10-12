@@ -3,10 +3,13 @@ package cs555.dht.utilities;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.math.BigInteger;
 import java.net.Inet4Address;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 // Functions used all over the program. Handy location
 public class Tools {
@@ -157,15 +160,54 @@ public class Tools {
 
 	// Generates hash
 	public static int generateHash() {
-		return 13;
+		// Timestamp
+		long epoch = System.currentTimeMillis()/1000;
+		return generateHash(String.valueOf(epoch));
 	}
-	
+
 	// Generate hash of file
-	public static int generateHash(String fname) {
-		//int space = Constants.Id_Space;
-		return 22;
+	public static int generateHash(String item) {
+		int bitsToTake = Constants.Id_Space / 4;
+		String itemMD5 = md5(item);
+		String partMD5 = "";
+		
+		// Take sampling of characters
+		for (int i=itemMD5.length()-1; i>=0; i--) {
+			if (partMD5.length() <= bitsToTake) {
+				if (i % 8 == 0) {
+					partMD5 += itemMD5.charAt(i);
+				}
+			}
+		}
+		
+		return Integer.parseInt(partMD5, 16);
 	}
-	
+
+	// MD5
+	public static String md5(String input) {
+
+		String md5 = null;
+
+		if(null == input) return null;
+
+		try {
+
+			//Create MessageDigest object for MD5
+			MessageDigest digest = MessageDigest.getInstance("MD5");
+
+			//Update input string in message digest
+			digest.update(input.getBytes(), 0, input.length());
+
+			//Converts message digest value in base 16 (hex) 
+			md5 = new BigInteger(1, digest.digest()).toString(16);
+
+		} catch (NoSuchAlgorithmException e) {
+
+			e.printStackTrace();
+		}
+		return md5;
+	}
+
 	//================================================================================
 	// Error Handling
 	//================================================================================
