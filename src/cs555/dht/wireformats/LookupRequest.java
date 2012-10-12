@@ -22,19 +22,20 @@ public class LookupRequest{
 	
 	public int resolveID; // 4
 	
+	public int ftEntry; // 4
 	
 	//================================================================================
 	// Constructors
 	//================================================================================
-	public LookupRequest(String h, int p, int i, int r){
-		init(h, p, i, r);
+	public LookupRequest(String h, int p, int i, int r, int e){
+		init(h, p, i, r, e);
 	}
 	
 	public LookupRequest(){
-		init("",0,-1,-1);
+		init("",0,-1,-1, -1);
 	}
 	
-	public void init(String h, int p, int i, int r){
+	public void init(String h, int p, int i, int r, int e){
 		type = Constants.lookup_request;
 		hopCount = 0;
 		
@@ -47,7 +48,9 @@ public class LookupRequest{
 		
 		resolveID = r;
 		
-		size = 4 + 4 + 4 + hostLength + 4 + 4 + 4;
+		ftEntry = e;
+		
+		size = 4 + 4 + 4 + hostLength + 4 + 4 + 4 + 4;
 	}
 	
 	
@@ -79,6 +82,9 @@ public class LookupRequest{
 		
 		// Resolve ID
 		bbuff.putInt(resolveID);
+		
+		// Entry seeking
+		bbuff.putInt(ftEntry);
 		
 		return bytes;
 	}
@@ -113,6 +119,9 @@ public class LookupRequest{
 		
 		// Resolve ID
 		resolveID = bbuff.getInt();
+		
+		// Entry Seeking
+		ftEntry = bbuff.getInt();
 	}
 	
 	//================================================================================

@@ -81,7 +81,7 @@ public class PeerNode extends Node{
 			RegisterResponse accessPoint = new RegisterResponse();
 			accessPoint.unmarshall(randomNodeData);
 
-			LookupRequest lookupReq = new LookupRequest(hostname, port, id, id);
+			LookupRequest lookupReq = new LookupRequest(hostname, port, id, id, 0);
 			Peer poc = new Peer(accessPoint.hostName, accessPoint.port, accessPoint.id);
 			Link accessLink = connect(poc);
 			accessLink.sendData(lookupReq.marshall());
@@ -135,10 +135,11 @@ public class PeerNode extends Node{
 			String requesterHost = lookup.hostName;
 			int requesterPort = lookup.port;
 			int requesterID = lookup.id;
+			int entry = lookup.ftEntry;
 
 			// If we are the target, handle it
 			if (state.itemIsMine(resolveID)) {
-				LookupResponse response = new LookupResponse(hostname, port, id, resolveID);
+				LookupResponse response = new LookupResponse(hostname, port, id, resolveID, entry);
 				Peer requester = new Peer(requesterHost, requesterPort, requesterID);
 				Link requesterLink = connect(requester);
 
@@ -161,16 +162,8 @@ public class PeerNode extends Node{
 
 			System.out.println("Received Reply : " + reply);
 
-			// If the reply resolves our ID, we found our sucessor
-			if (reply.responseResolves(id)) {
-				// Set the replier to our new successor
-
-				// Tell the process who replied that we are now they're new predecessor	
-			}
-
-			else {
-				System.out.println("Response does not resolve my ID");
-			}
+			// Heard back for FingerTable entry, update state
+			state.parseState(reply);
 			
 			break;
 

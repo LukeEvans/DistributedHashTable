@@ -3,6 +3,7 @@ package cs555.dht.state;
 import cs555.dht.node.PeerNode;
 import cs555.dht.peer.*;
 import cs555.dht.utilities.Constants;
+import cs555.dht.wireformats.LookupResponse;
 
 public class State {
 	Peer successor;
@@ -50,6 +51,19 @@ public class State {
 	// Update State
 	//================================================================================
 	public void update() {
+		
+	}
+	
+	// Decide where to put this peer in Finger Table
+	public void parseState(LookupResponse reply) {
+		Peer peer = new Peer(reply.hostName, reply.port, reply.id);
+		
+		// If it's our first entry getting back to us, add it as our sucessor
+		if (reply.ftEntry == 0) {
+			successor = peer;
+		}
+		
+		fingerTable.addEntry(reply.ftEntry, peer);
 		
 	}
 	
