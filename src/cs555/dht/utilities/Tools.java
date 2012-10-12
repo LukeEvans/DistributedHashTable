@@ -180,7 +180,8 @@ public class Tools {
 			}
 		}
 		
-		return Integer.parseInt(partMD5, 16);
+		int hashInt = Integer.parseInt(partMD5, 16);
+		return hashInt;
 	}
 
 	// MD5
