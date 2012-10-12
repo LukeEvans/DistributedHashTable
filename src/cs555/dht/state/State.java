@@ -2,6 +2,7 @@ package cs555.dht.state;
 
 import cs555.dht.node.PeerNode;
 import cs555.dht.peer.*;
+import cs555.dht.utilities.Constants;
 
 public class State {
 	Peer successor;
@@ -56,7 +57,21 @@ public class State {
 	// Resolving
 	//================================================================================
 	public boolean itemIsMine(int h) {
-		return true;
+		// Same side of ring
+		if ((h > predecessor.id) && h <= thisID) {
+			return true;
+		}
+		
+		// left side of gap
+		if ((h > predecessor.id) && (h < (Math.pow(2, Constants.Id_Space)))) {
+			return true;
+		}
+		
+		if ((h >= 0) && (h <= thisID)) {
+			return true;
+		}
+		
+		return false;
 	}
 	
 	// Get the next closest peer to this id from finger table

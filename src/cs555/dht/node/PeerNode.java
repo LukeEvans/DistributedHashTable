@@ -95,7 +95,7 @@ public class PeerNode extends Node{
 			// If we heard back that we're the first node, modify state accordingly
 			if (response.number == Constants.Null_Peer) {				
 				// Add ourselves as all entries in FT
-				// state.firstToArrive();
+				state.firstToArrive();
 			}
 
 			break;
