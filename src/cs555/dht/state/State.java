@@ -29,12 +29,64 @@ public class State {
 	//================================================================================
 	// State manipulation
 	//================================================================================
+	// Check successor candidate
+	public boolean shouldAddNewSuccessor(Peer p) {
+		if ((successor.id == thisID) || (successor == null)) {
+			return true;
+		}
+		
+		// Same side of ring
+		if ((p.id < successor.id) && (p.id > thisID)) {
+			return true;
+		}
+		
+		// left side of gap
+		if ((p.id > thisID) && (p.id < (Math.pow(2, Constants.Id_Space)))) {
+			return true;
+		}
+		
+		// Right side of gap
+		if ((p.id >= 0) && (p.id < successor.id)) {
+			return true;
+		}
+		
+		return false;
+	}
+	
 	public void addSucessor(Peer p) {
+		if (!shouldAddNewSuccessor(p)) {
+			System.out.println("New Successor is not closer than old : " + p.id);
+			return;
+		}
 		successor = p;
 	}
 	
+	// check predeccessor candidate
+	public boolean shouldAddNewPredecessor(Peer p) {
+		if ((predecessor.id == thisID) || (predecessor == null)) {
+			return true;
+		}
+		
+		if (itemIsMine(p.id)) {
+			return true;
+		}
+		
+		return false;
+	}
+	
 	public void addPredecessor(Peer p) {
+		
+		if (!shouldAddNewPredecessor(p)) {
+			System.out.println("New Predessor is not closer than old : " + p.id);
+			return;
+		}
+		
 		predecessor = p;
+		
+		// If our successor is ourself, and p as our successor as well
+		if (successor.id == thisID) {
+			addSucessor(p);
+		}
 	}
 	
 	// Set all values to self
@@ -81,6 +133,7 @@ public class State {
 			return true;
 		}
 		
+		// right side of gap
 		if ((h >= 0) && (h <= thisID)) {
 			return true;
 		}
