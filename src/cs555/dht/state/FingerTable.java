@@ -74,6 +74,10 @@ public class FingerTable {
 	
 	public void addEntry(int location, Peer p) {
 		table[location] = p;
+		
+		if (location == table.length - 1) {
+			node.printDiagnostics();
+		}
 	}
 	
 	//================================================================================
