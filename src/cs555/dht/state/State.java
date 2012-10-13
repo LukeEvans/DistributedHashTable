@@ -107,6 +107,8 @@ public class State {
 		
 		// Add thisPeer as all values in FT
 		fingerTable.firstToArrive(thisPeer);
+		
+		System.out.println("First to arrive");
 	}
 	
 	//================================================================================
