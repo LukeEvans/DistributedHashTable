@@ -4,6 +4,7 @@ import cs555.dht.node.PeerNode;
 import cs555.dht.peer.*;
 import cs555.dht.utilities.Constants;
 import cs555.dht.wireformats.LookupResponse;
+import cs555.dht.wireformats.PredessesorRequest;
 
 public class State {
 	Peer successor;
@@ -22,7 +23,7 @@ public class State {
 		thisID = h;
 		myself = p;
 		
-		fingerTable = new FingerTable(thisID);
+		fingerTable = new FingerTable(thisID,myself);
 	}
 	
 	
@@ -59,6 +60,15 @@ public class State {
 			return;
 		}
 		successor = p;
+		
+		// Tell our new successor that we're it's predecessor
+		PredessesorRequest req = new PredessesorRequest(myself.hostname, myself.port, myself.id);
+		myself.sendPredessessorRequest(successor, req);
+		
+		// Our successor changed, update finger table
+		fingerTable.addEntry(0, successor);
+		fingerTable.buildFingerTable();
+		
 	}
 	
 	// check predeccessor candidate
@@ -112,7 +122,7 @@ public class State {
 		
 		// If it's our first entry getting back to us, add it as our sucessor
 		if (reply.ftEntry == 0) {
-			successor = peer;
+			addSucessor(peer);
 		}
 		
 		fingerTable.addEntry(reply.ftEntry, peer);

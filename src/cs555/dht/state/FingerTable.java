@@ -1,21 +1,39 @@
 package cs555.dht.state;
 
+import cs555.dht.node.PeerNode;
 import cs555.dht.peer.Peer;
 import cs555.dht.utilities.Constants;
+import cs555.dht.wireformats.LookupRequest;
 
 public class FingerTable {
 	
 	Peer table[];
 	int id;
+	PeerNode node;
 	
 	//================================================================================
 	// Constructor
 	//================================================================================
-	public FingerTable(int i) {
+	public FingerTable(int i, PeerNode p) {
 		table = new Peer[Constants.Id_Space];
 		id = i;
+		node = p;
 	}
 	
+	//================================================================================
+	// Build Finger Table
+	//================================================================================
+	public void buildFingerTable() {
+		for (int i=1; i<table.length; i++) {
+			int resolve =  (id + (int) Math.pow(2, (i)));
+			if (resolve > (int) Math.pow(2, Constants.Id_Space) -1 ) {
+				resolve = resolve % ((int) Math.pow(2, Constants.Id_Space));
+			}
+			
+			LookupRequest req = new LookupRequest(node.hostname, node.port, node.id, resolve, i);
+			node.sendLookup(table[i], req);
+		}
+	}
 	
 	//================================================================================
 	// Resolve

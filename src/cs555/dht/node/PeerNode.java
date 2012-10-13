@@ -8,6 +8,7 @@ import cs555.dht.utilities.*;
 import cs555.dht.wireformats.LookupRequest;
 import cs555.dht.wireformats.LookupResponse;
 import cs555.dht.wireformats.Payload;
+import cs555.dht.wireformats.PredessesorRequest;
 import cs555.dht.wireformats.RegisterRequest;
 import cs555.dht.wireformats.RegisterResponse;
 
@@ -116,6 +117,19 @@ public class PeerNode extends Node{
 	}
 
 	//================================================================================
+	// Send
+	//================================================================================
+	public void sendLookup(Peer p, LookupRequest l) {
+		Link lookupPeer = connect(p);
+		lookupPeer.sendData(l.marshall());
+	}
+	
+	public void sendPredessessorRequest(Peer p, PredessesorRequest r) {
+		Link sucessorLink = connect(p);
+		sucessorLink.sendData(r.marshall());
+	}
+	
+	//================================================================================
 	// Receive
 	//================================================================================
 	// Receieve data
@@ -167,6 +181,19 @@ public class PeerNode extends Node{
 			
 			break;
 
+		case Constants.Predesessor_Request:
+			
+			PredessesorRequest predReq = new PredessesorRequest();
+			predReq.unmarshall(bytes);
+			
+			System.out.println("Recieved predessor request : " + predReq);
+			
+			// Add this node as our predessesor
+			Peer pred = new Peer(predReq.hostName, predReq.port, predReq.id);
+			state.addPredecessor(pred);
+			
+			break;
+			
 		default:
 			System.out.println("Unrecognized Message");
 			break;
