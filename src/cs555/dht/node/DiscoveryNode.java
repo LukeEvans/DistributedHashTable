@@ -12,78 +12,89 @@ import cs555.dht.wireformats.RegisterResponse;
 import cs555.dht.wireformats.Verification;
 
 public class DiscoveryNode extends Node{
-	
+
 	PeerList peerList;
-	
+
 	//================================================================================
 	// Constructor
 	//================================================================================
 	public DiscoveryNode(PeerList list, int port){
 		super(port);
-		
+
 		peerList = list;
 	}
-	
 
-	
+
+
 	//================================================================================
 	// Receive
 	//================================================================================
 	// Receieve data
 	public synchronized void receive(byte[] bytes, Link l){
 		int messageType = Tools.getMessageType(bytes);
-		
+
 		switch (messageType) {
-		
+
 		case Constants.Registration_Request:
 
 			RegisterRequest rreq = new RegisterRequest();
 			rreq.unmarshall(bytes);
-	
+
+			System.out.println("Got : " + rreq);
+
 			// If peer's id collides, return a failure message
 			if (!peerList.hashUnique(rreq.id)) {
+				System.out.println("sending failure");
 				Verification failure = new Verification(Constants.Failure);
 				l.sendData(failure.marshall());
 				break;
 			}
-			
+
+			// Send a success
+			Verification success = new Verification(Constants.Success);
+			l.sendData(success.marshall());
+
 			// Return a random peer
 			Peer returnPeer = peerList.getNextPeer();
-			
+
 			// If return peer is null, the requesting node is the first to join. Return null
 			if (returnPeer == null) {
+				System.out.println("return peer is null");
 				Payload nullPeer = new Payload(Constants.Null_Peer);
 				l.sendData(nullPeer.marshall());
-				break;
 			}
-			
-			// Else, we have a valid peer to return
-			RegisterResponse rresp = new RegisterResponse(returnPeer.hostname, returnPeer.port, returnPeer.id);
-			l.sendData(rresp.marshall());
+
+			else {
+				// Else, we have a valid peer to return
+				RegisterResponse rresp = new RegisterResponse(returnPeer.hostname, returnPeer.port, returnPeer.id);
+				l.sendData(rresp.marshall());
+
+				System.out.println("returning node : " + rresp);
+			}
 			
 			// Add peer to list
 			Peer addPeer = new Peer(rreq.hostName, rreq.port, rreq.id);
 			peerList.addPeer(addPeer);
-			
+
 			break;
 
 		case Constants.Deregister_Request:
 			DeregisterRequest deregisterRequest = new DeregisterRequest();
 			deregisterRequest.unmarshall(bytes);
-			
+
 			// Remove peer
 			Peer removePeer = new Peer(deregisterRequest.hostName, deregisterRequest.port, deregisterRequest.id);
 			peerList.removePeer(removePeer);
-			
+
 			break;
-			
+
 		default:
 			System.out.println("Unrecognized Message");
 			break;
 		}
 	}
-	
-	
+
+
 	//================================================================================
 	//================================================================================
 	// Main
@@ -92,12 +103,12 @@ public class DiscoveryNode extends Node{
 	public static void main(String[] args){
 
 		int port = 0;
-		
+
 		if (args.length == 1) {
 			port = Integer.parseInt(args[0]);
-			
+
 		}
-		
+
 		else {
 			System.out.println("Usage: java cs555.dht.node.DiscoveryNode PORT");
 			System.exit(1);
@@ -109,6 +120,6 @@ public class DiscoveryNode extends Node{
 		// Create node
 		DiscoveryNode manager = new  DiscoveryNode(peerList, port);
 		manager.initServer();
-		
+
 	}
 }

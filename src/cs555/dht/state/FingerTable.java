@@ -10,6 +10,7 @@ public class FingerTable {
 	Peer table[];
 	int id;
 	PeerNode node;
+	int size;
 	
 	//================================================================================
 	// Constructor
@@ -18,20 +19,25 @@ public class FingerTable {
 		table = new Peer[Constants.Id_Space];
 		id = i;
 		node = p;
+		size = 0;
 	}
 	
 	//================================================================================
 	// Build Finger Table
 	//================================================================================
 	public void buildFingerTable() {
-		for (int i=1; i<table.length; i++) {
+		// Set size back to zero
+		size = 0;
+		
+		for (int i=0; i<table.length; i++) {
 			int resolve =  (id + (int) Math.pow(2, (i)));
 			if (resolve > (int) Math.pow(2, Constants.Id_Space) -1 ) {
 				resolve = resolve % ((int) Math.pow(2, Constants.Id_Space));
 			}
 			
+			System.out.println("Trying to resolve : " + resolve);
 			LookupRequest req = new LookupRequest(node.hostname, node.port, node.id, resolve, i);
-			node.sendLookup(table[i], req);
+			node.sendLookup(table[0], req);
 		}
 	}
 	
@@ -46,7 +52,7 @@ public class FingerTable {
 		}
 		
 		// If the id is passed our purview, send it as far as we can
-		if (h > table[Constants.Id_Space - 1].id) {
+		if (h > table[table.length - 1].id) {
 			return table[Constants.Id_Space - 1];
 		}
 		
@@ -66,16 +72,18 @@ public class FingerTable {
 	// State manipulation
 	//================================================================================
 	// Add myself as every entry
-	public void firstToArrive(Peer myself) {
+	public void fillTableWith(Peer peer) {
 		for (int i=0; i<table.length; i++) {
-			table[i] = myself;
+			table[i] = peer;
 		}
 	}
 	
 	public void addEntry(int location, Peer p) {
 		table[location] = p;
+		size++;
 		
-		if (location == table.length - 1) {
+		System.out.println("Size : " + size);
+		if (size >= Constants.Id_Space) {
 			node.printDiagnostics();
 		}
 	}
@@ -89,7 +97,13 @@ public class FingerTable {
 		for (int i=0; i<table.length; i++) {
 			Peer p = table[i];
 			
-			s += i+1 + ": " + p.toString() + "\n"; 
+			if (p == null) {
+				System.out.println("Freaking peer is null: " + i);
+				s += i+1 + ": null " + ((id) + (int) Math.pow(2, i)) +"\n";
+				return s;
+			}
+			
+			s += i+1 + ": " + p.toString() + " : "+ ((id) + (int) Math.pow(2, i)) +"\n"; 
 		}
 		
 		return s;

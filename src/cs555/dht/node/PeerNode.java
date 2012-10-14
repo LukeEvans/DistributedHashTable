@@ -43,8 +43,8 @@ public class PeerNode extends Node{
 
 		managerLink = null;
 
-		state = new State(id, this);
 		hostname = Tools.getLocalHostname();
+		state = new State(id, this);
 
 		refreshThread = new RefreshThread(this, refreshTime);
 	}
@@ -57,7 +57,7 @@ public class PeerNode extends Node{
 		super.initServer();
 
 		// Start thread for refreshing hash
-		refreshThread.start();
+		//refreshThread.start();
 	}
 
 	public void enterDHT(String dHost, int dPort) {
@@ -65,6 +65,8 @@ public class PeerNode extends Node{
 		RegisterRequest regiserReq = new RegisterRequest(hostname, port, id);
 		managerLink.sendData(regiserReq.marshall());
 
+		System.out.println("Sent : " + regiserReq);
+		
 		// Keep sending until we are able to enter
 		while (managerLink.waitForIntReply() == Constants.Failure) {
 			id = Tools.generateHash();
@@ -72,13 +74,15 @@ public class PeerNode extends Node{
 			managerLink.sendData(regiserReq.marshall());
 		}
 
+		System.out.println("waiting for reply");
+		
 		// Wait for data from Discovery
 		byte[] randomNodeData = managerLink.waitForData();
 		int messageType = Tools.getMessageType(randomNodeData);
 
 		switch (messageType) {
 		case Constants.Registration_Reply: 
-
+			System.out.println("recieved reply");
 			RegisterResponse accessPoint = new RegisterResponse();
 			accessPoint.unmarshall(randomNodeData);
 
@@ -86,10 +90,11 @@ public class PeerNode extends Node{
 			Peer poc = new Peer(accessPoint.hostName, accessPoint.port, accessPoint.id);
 			Link accessLink = connect(poc);
 			accessLink.sendData(lookupReq.marshall());
-			
+			System.out.println("sending : " + lookupReq);
 			break;
 
 		case Constants.Payload:
+			System.out.println("received paylosd");
 			Payload response = new Payload();
 			response.unmarshall(randomNodeData);
 
@@ -142,7 +147,7 @@ public class PeerNode extends Node{
 			LookupRequest lookup = new LookupRequest();
 			lookup.unmarshall(bytes);
 
-			System.out.println("Recieved Request : " + lookup);
+			System.out.println("Recieved Request :: " + lookup);
 
 			// Info about the lookup
 			int resolveID = lookup.resolveID;
@@ -153,6 +158,7 @@ public class PeerNode extends Node{
 
 			// If we are the target, handle it
 			if (state.itemIsMine(resolveID)) {
+				System.out.println("is mine I promise : " + resolveID);
 				LookupResponse response = new LookupResponse(hostname, port, id, resolveID, entry);
 				Peer requester = new Peer(requesterHost, requesterPort, requesterID);
 				Link requesterLink = connect(requester);
@@ -162,7 +168,10 @@ public class PeerNode extends Node{
 
 			// Else, pass it along
 			else {
-				Link nextHop = connect(state.getNexClosestPeer(resolveID));
+				System.out.println("not mine I promise : " + resolveID);
+				Peer nextPeer = state.getNexClosestPeer(resolveID);
+				System.out.println("Sending to : " + nextPeer.id);
+				Link nextHop = connect(nextPeer);
 				lookup.hopCount++;
 				nextHop.sendData(lookup.marshall());
 			}
@@ -195,7 +204,7 @@ public class PeerNode extends Node{
 			break;
 			
 		default:
-			System.out.println("Unrecognized Message");
+			System.out.println("Unrecognized Message : " + messageType);
 			break;
 		}
 	}
@@ -245,8 +254,8 @@ public class PeerNode extends Node{
 		PeerNode peer = new PeerNode(localPort, id, refreshTime);
 
 		// Enter DHT
-		peer.enterDHT(discoveryHost, discoveryPort);
 		peer.initServer();
+		peer.enterDHT(discoveryHost, discoveryPort);
 
 	}
 }

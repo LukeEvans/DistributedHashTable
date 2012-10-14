@@ -37,7 +37,7 @@ public class LookupRequest{
 	
 	public void init(String h, int p, int i, int r, int e){
 		type = Constants.lookup_request;
-		hopCount = 0;
+		hopCount = 1;
 		
 		hostLength = h.length();
 		hostName = h;
@@ -64,11 +64,11 @@ public class LookupRequest{
 		// Size
 		bbuff.putInt(size);
 		
-		// Hop count 
-		bbuff.putInt(hopCount);
-		
 		// type
 		bbuff.putInt(type);
+		
+		// Hop count 
+		bbuff.putInt(hopCount);
 		
 		// Host length and hostname
 		bbuff.putInt(hostLength);
@@ -98,12 +98,12 @@ public class LookupRequest{
 		
 		// Size
 		size = bbuff.getInt();
-			
-		// Hopcount 
-		hopCount = bbuff.getInt();
 		
 		// type
 		type = bbuff.getInt();
+		
+		// Hopcount 
+		hopCount = bbuff.getInt();
 		
 		// Host length and hostname
 		hostLength = bbuff.getInt();
@@ -131,7 +131,7 @@ public class LookupRequest{
 	public String toString(){
 		String s = "";
 		
-		s += "Peer: " + hostName + ":" + port + ", " + id + " resolving :" + resolveID + " " + hopCount + "\n";
+		s += hostName + ":" + port + ", " + id + " resolving :" + resolveID + " hopCount: " + hopCount + " entry: " + ftEntry + "\n";
 		
 		return s;
 	}
