@@ -66,14 +66,14 @@ public class DiscoveryNode extends Node{
 				RegisterResponse rresp = new RegisterResponse(returnPeer.hostname, returnPeer.port, returnPeer.id);
 				l.sendData(rresp.marshall());
 
-				System.out.println("returning node : " + rresp.id);
+				System.out.println("returning node : " + Integer.toHexString(rresp.id));
 			}
 			
 			// Add peer to list
 			Peer addPeer = new Peer(rreq.hostName, rreq.port, rreq.id);
 			peerList.addPeer(addPeer);
 
-			System.out.println(rreq.id + " joined the system\n");
+			System.out.println(Integer.toHexString(rreq.id) + " joined the system\n");
 			
 			break;
 
@@ -85,7 +85,7 @@ public class DiscoveryNode extends Node{
 			Peer removePeer = new Peer(deregisterRequest.hostName, deregisterRequest.port, deregisterRequest.id);
 			peerList.removePeer(removePeer);
 
-			System.out.println(removePeer.id + " has left the system");
+			System.out.println(Integer.toHexString(removePeer.id) + " has left the system");
 			break;
 
 		default:

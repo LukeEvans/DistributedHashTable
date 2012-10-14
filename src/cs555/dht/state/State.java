@@ -216,9 +216,9 @@ public class State {
 		String s = "";
 
 		s += "\n================================================================================\n";
-		s += "Diagnostics at node: " + thisID + "\n";
-		s += "Predesessor: " + predecessor.id + "\n";
-		s += "Sucessor: " + successor.id + "\n";
+		s += "Diagnostics at node: " + Integer.toHexString(thisID) + "\n";
+		s += "Predesessor: " + Integer.toHexString(predecessor.id) + "\n";
+		s += "Sucessor: " + Integer.toHexString(successor.id) + "\n";
 		s += "\nFT: \n" + fingerTable.toString();
 		s += "================================================================================\n";
 
