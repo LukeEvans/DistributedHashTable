@@ -32,7 +32,7 @@ public class Constants {
 	public static final int LEN_BYTES = 3072;
 	
 	// ID space of DHT
-	public static final int Id_Space = 16;
+	public static final int Id_Space = 4;
 	
 	// Base path for data to be stored
 	public static final String base_path = "/tmp/evansl/dhtData/";

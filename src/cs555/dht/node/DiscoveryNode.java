@@ -66,7 +66,7 @@ public class DiscoveryNode extends Node{
 				RegisterResponse rresp = new RegisterResponse(returnPeer.hostname, returnPeer.port, returnPeer.id);
 				l.sendData(rresp.marshall());
 
-				System.out.println("returning node : " + Integer.toHexString(rresp.id));
+				System.out.println("returning node : " + rresp.id);
 			}
 			
 			// Add peer to list
