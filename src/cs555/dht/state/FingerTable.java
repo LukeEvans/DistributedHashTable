@@ -104,7 +104,7 @@ public class FingerTable {
 				resolving = resolving % (int) Math.pow(2, Constants.Id_Space);
 			}
 
-			s += i+1 + ": succ(" + Integer.toHexString(resolving) + ")	= " + Integer.toHexString(p.id) + " \n"; 
+			s += i+1 + ": succ(" + resolving + ")	= " + p.id + " \n"; 
 		}
 
 		return s;
