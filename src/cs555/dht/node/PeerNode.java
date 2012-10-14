@@ -174,9 +174,12 @@ public class PeerNode extends Node{
 
 			// Else, pass it along
 			else {
+				
+
 				//System.out.println("is not mine : " + resolveID);
 				Peer nextPeer = state.getNexClosestPeer(resolveID);
 				Link nextHop = connect(nextPeer);
+				
 				lookup.hopCount++;
 				nextHop.sendData(lookup.marshall());
 			}

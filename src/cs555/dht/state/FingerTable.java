@@ -50,6 +50,12 @@ public class FingerTable {
 			return table[0];
 		}
 
+		if (table[0].id < id) {
+			if ((h > id) || (h < table[0].id)){
+				return table[0];
+			}
+		}
+		
 		// If the id is passed our purview, send it as far as we can
 		if (h > table[table.length - 1].id) {
 			if (table[Constants.Id_Space-1].id != id){
