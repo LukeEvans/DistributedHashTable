@@ -210,7 +210,6 @@ public class PeerNode extends Node{
 				
 				lookup.hopCount++;
 				System.out.println("Routing query from " + lookup);
-				System.out.println("sending to : " + nextPeer.id);
 				nextHop.sendData(lookup.marshall());
 			}
 
