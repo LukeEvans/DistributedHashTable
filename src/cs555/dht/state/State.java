@@ -3,12 +3,12 @@ package cs555.dht.state;
 import cs555.dht.node.PeerNode;
 import cs555.dht.peer.*;
 import cs555.dht.utilities.Constants;
-import cs555.dht.wireformats.LookupResponse;
+import cs555.dht.wireformats.*;
 import cs555.dht.wireformats.PredessesorRequest;
 
 public class State {
-	Peer successor;
-	Peer predecessor;
+	public Peer successor;
+	public Peer predecessor;
 	int thisID;
 	PeerNode myself;
 
@@ -39,6 +39,10 @@ public class State {
 			if (successor.id == p.id) {
 				return false;
 			}
+			
+			if (p.id == thisID) {
+				return false;
+			}
 		}
 
 		if ((successor == null) || (successor.id == thisID)) {
@@ -65,14 +69,13 @@ public class State {
 
 	public void addSucessor(Peer p) {
 		if (!shouldAddNewSuccessor(p)) {
-			System.out.println("New Successor is not closer than old : " + p.id);
 			return;
 		}
+		
 		successor = p;
 
 		fingerTable.fillTableWith(successor);
 
-		System.out.println("suc ID : " + successor.id);
 		// Send predecesor request if, we're not the only one
 		if (successor.id != thisID) {
 			// Tell our new successor that we're it's predecessor
@@ -90,6 +93,10 @@ public class State {
 	// check predeccessor candidate
 	public boolean shouldAddNewPredecessor(Peer p) {
 
+		if (p.id == thisID) {
+			return false;
+		}
+		
 		if (predecessor != null) {
 			if (predecessor.id == p.id) {
 				return false;
@@ -101,7 +108,6 @@ public class State {
 		}
 
 		if (itemIsMine(p.id)) {
-			System.out.println("is mine == true");
 			return true;
 		}
 
@@ -110,13 +116,11 @@ public class State {
 
 	public void addPredecessor(Peer p) {
 
-		if (!shouldAddNewPredecessor(p)) {
-			System.out.println("New Predessor is not closer than old : " + p.id);
+		if (!shouldAddNewPredecessor(p)) {		
 			return;
 		}
 
 		predecessor = p;
-		System.out.println("adding predicesosr : " + p.id);
 
 		// If our successor is ourself, and p as our successor as well
 		if (successor.id == thisID) {
@@ -139,19 +143,19 @@ public class State {
 	// Update State
 	//================================================================================
 	public void update() {
-
+		fingerTable.buildFingerTable();
 	}
 
 	// Decide where to put this peer in Finger Table
-	public void parseState(LookupResponse reply) {
-		Peer peer = new Peer(reply.hostName, reply.port, reply.id);
+	public void parseState(LookupRequest l) {
+		Peer peer = new Peer(l.hostName, l.port, l.id);
 
 		// If it's our first entry getting back to us, add it as our sucessor
-		if (reply.ftEntry == 0) {
+		if (l.ftEntry == 0) {
 			addSucessor(peer);
 		}
 
-		fingerTable.addEntry(reply.ftEntry, peer);
+		fingerTable.addEntry(l.ftEntry, peer);
 
 	}
 
@@ -159,21 +163,21 @@ public class State {
 	// Resolving
 	//================================================================================
 	public boolean itemIsMine(int h) {
+		
+		//System.out.println("pred id : " + predecessor.id  + " Suc id: " + successor.id + " hash: " + h);
+		
 		// Same side of ring
 		if ((h > predecessor.id) && h <= thisID) {
-			System.out.println("same");
 			return true;
 		}
 
 		// left side of gap
 		if ((h > predecessor.id) && (h < (Math.pow(2, Constants.Id_Space)))) {
 
-			System.out.println("pred ID : " + predecessor.id);
 			if (predecessor.id < thisID) {
 				return false;
 			}
 
-			System.out.println("left");
 			return true;
 		}
 
@@ -182,7 +186,10 @@ public class State {
 			return true;
 		}
 
-
+		// If We're currently the only process in the system 
+		if ((thisID == predecessor.id) && (thisID == successor.id)) {
+			return true;
+		}
 
 		return false;
 	}

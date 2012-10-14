@@ -55,7 +55,6 @@ public class PeerList {
 	// Get next peer
 	public Peer getNextPeer(){
 		if (listOfPeers.size() == 0){
-			System.out.println("size is 0 somehow");
 			return null;
 		}
 		

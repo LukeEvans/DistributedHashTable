@@ -53,15 +53,16 @@ public class DiscoveryNode extends Node{
 			// Send a success
 			Verification success = new Verification(Constants.Success);
 			l.sendData(success.marshall());
+			l.waitForIntReply();
 
 			// Return a random peer
 			Peer returnPeer = peerList.getNextPeer();
 
 			// If return peer is null, the requesting node is the first to join. Return null
 			if (returnPeer == null) {
-				System.out.println("return peer is null");
 				Payload nullPeer = new Payload(Constants.Null_Peer);
 				l.sendData(nullPeer.marshall());
+				System.out.println("First to arrive");
 			}
 
 			else {
