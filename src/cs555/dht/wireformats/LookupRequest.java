@@ -37,7 +37,7 @@ public class LookupRequest{
 	
 	public void init(String h, int p, int i, int r, int e){
 		type = Constants.lookup_request;
-		hopCount = 1;
+		hopCount = 0;
 		
 		hostLength = h.length();
 		hostName = h;
@@ -131,7 +131,7 @@ public class LookupRequest{
 	public String toString(){
 		String s = "";
 		
-		s += hostName + ":" + port + ", " + id + " resolving :" + resolveID + " hopCount: " + hopCount + " entry: " + ftEntry + "\n";
+		s += "node: " + id + " resolving: " + resolveID + " hopCount: " + hopCount + "\n";
 		
 		return s;
 	}

@@ -47,7 +47,6 @@ public class PeerNode extends Node{
 		managerLink = null;
 
 		hostname = Tools.getLocalHostname();
-		state = new State(id, this);
 
 		refreshThread = new RefreshThread(this, refreshTime);
 	}
@@ -76,8 +75,11 @@ public class PeerNode extends Node{
 			managerLink.sendData(regiserReq.marshall());
 		}
 
+		// Tell Discovery we're ready for our access point
 		Verification verify = new Verification(Constants.Success);
 		managerLink.sendData(verify.marshall());
+		
+		state = new State(id, this);
 		
 		// Wait for data from Discovery
 		byte[] randomNodeData = managerLink.waitForData();
@@ -124,13 +126,7 @@ public class PeerNode extends Node{
 	//================================================================================
 	// Send
 	//================================================================================
-	public void sendLookup(Peer p, LookupRequest l) {
-		// Skip sending this lookup if we know we own it
-//		if (state.itemIsMine(l.resolveID)) {
-//			state.parseState(l);
-//			return;
-//		}
-			
+	public void sendLookup(Peer p, LookupRequest l) {		
 		Link lookupPeer = connect(p);
 		lookupPeer.sendData(l.marshall());
 	}
@@ -154,8 +150,6 @@ public class PeerNode extends Node{
 			LookupRequest lookup = new LookupRequest();
 			lookup.unmarshall(bytes);
 
-			System.out.println("Recieved Request : " + lookup);
-
 			// Info about the lookup
 			int resolveID = lookup.resolveID;
 			String requesterHost = lookup.hostName;
@@ -174,13 +168,13 @@ public class PeerNode extends Node{
 
 			// Else, pass it along
 			else {
-				
 
 				//System.out.println("is not mine : " + resolveID);
 				Peer nextPeer = state.getNexClosestPeer(resolveID);
 				Link nextHop = connect(nextPeer);
 				
 				lookup.hopCount++;
+				System.out.println("Routing query from " + lookup);
 				nextHop.sendData(lookup.marshall());
 			}
 

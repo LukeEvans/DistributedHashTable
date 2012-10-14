@@ -40,11 +40,8 @@ public class DiscoveryNode extends Node{
 			RegisterRequest rreq = new RegisterRequest();
 			rreq.unmarshall(bytes);
 
-			System.out.println("Got : " + rreq);
-
 			// If peer's id collides, return a failure message
 			if (!peerList.hashUnique(rreq.id)) {
-				System.out.println("sending failure");
 				Verification failure = new Verification(Constants.Failure);
 				l.sendData(failure.marshall());
 				break;
@@ -62,7 +59,6 @@ public class DiscoveryNode extends Node{
 			if (returnPeer == null) {
 				Payload nullPeer = new Payload(Constants.Null_Peer);
 				l.sendData(nullPeer.marshall());
-				System.out.println("First to arrive");
 			}
 
 			else {
@@ -70,13 +66,15 @@ public class DiscoveryNode extends Node{
 				RegisterResponse rresp = new RegisterResponse(returnPeer.hostname, returnPeer.port, returnPeer.id);
 				l.sendData(rresp.marshall());
 
-				System.out.println("returning node : " + rresp);
+				System.out.println("returning node : " + rresp.id);
 			}
 			
 			// Add peer to list
 			Peer addPeer = new Peer(rreq.hostName, rreq.port, rreq.id);
 			peerList.addPeer(addPeer);
 
+			System.out.println(rreq.id + " joined the system\n");
+			
 			break;
 
 		case Constants.Deregister_Request:

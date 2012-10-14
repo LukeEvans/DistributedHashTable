@@ -164,8 +164,6 @@ public class State {
 	//================================================================================
 	public boolean itemIsMine(int h) {
 		
-		//System.out.println("pred id : " + predecessor.id  + " Suc id: " + successor.id + " hash: " + h);
-		
 		// Same side of ring
 		if ((h > predecessor.id) && h <= thisID) {
 			return true;
@@ -205,9 +203,12 @@ public class State {
 	public String toString(){
 		String s = "";
 
-		s += "Predesessor: " + predecessor.toString() + "\n";
-		s += "Sucessor: " + successor.toString() + "\n";
-		s += "FT: \n" + fingerTable.toString();
+		s += "\n================================================================================\n";
+		s += "Diagnostics at node: " + thisID + "\n";
+		s += "Predesessor: " + predecessor.id + "\n";
+		s += "Sucessor: " + successor.id + "\n";
+		s += "\nFT: \n" + fingerTable.toString();
+		s += "================================================================================\n";
 
 		return s;
 	}
