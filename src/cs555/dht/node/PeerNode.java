@@ -5,13 +5,16 @@ import cs555.dht.peer.Peer;
 import cs555.dht.state.RefreshThread;
 import cs555.dht.state.State;
 import cs555.dht.utilities.*;
+import cs555.dht.wireformats.DeregisterRequest;
 import cs555.dht.wireformats.LookupRequest;
 import cs555.dht.wireformats.LookupResponse;
 import cs555.dht.wireformats.Payload;
+import cs555.dht.wireformats.PredessesorLeaving;
 import cs555.dht.wireformats.PredessesorRequest;
 import cs555.dht.wireformats.PredessesorResponse;
 import cs555.dht.wireformats.RegisterRequest;
 import cs555.dht.wireformats.RegisterResponse;
+import cs555.dht.wireformats.SuccessorLeaving;
 import cs555.dht.wireformats.SuccessorRequest;
 import cs555.dht.wireformats.Verification;
 
@@ -62,6 +65,9 @@ public class PeerNode extends Node{
 		refreshThread.start();
 	}
 
+	//================================================================================
+	// Enter DHT
+	//================================================================================
 	public void enterDHT(String dHost, int dPort) {
 		managerLink = connect(new Peer(dHost, dPort));
 		RegisterRequest regiserReq = new RegisterRequest(hostname, port, id);
@@ -78,13 +84,13 @@ public class PeerNode extends Node{
 		// Tell Discovery we're ready for our access point
 		Verification verify = new Verification(Constants.Success);
 		managerLink.sendData(verify.marshall());
-		
+
 		state = new State(id, this);
-		
+
 		// Wait for data from Discovery
 		byte[] randomNodeData = managerLink.waitForData();
 		int messageType = Tools.getMessageType(randomNodeData);
-		
+
 		switch (messageType) {
 		case Constants.Registration_Reply: 
 			RegisterResponse accessPoint = new RegisterResponse();
@@ -113,6 +119,30 @@ public class PeerNode extends Node{
 			break;
 		}	
 
+	}
+	
+	//================================================================================
+	// Exit CDN
+	//================================================================================
+	public void leaveDHT(){
+		// If we haven't entered, leave
+		if (managerLink == null) {
+			return;
+		}
+		
+		DeregisterRequest dreq = new DeregisterRequest(hostname, port, id);
+		managerLink.sendData(dreq.marshall());
+		
+		// Tell our successor we're leaving
+		PredessesorLeaving predLeaving = new PredessesorLeaving(state.predecessor.hostname, state.predecessor.port, state.predecessor.id);
+		Link successorLink = connect(state.successor);
+		successorLink.sendData(predLeaving.marshall());
+		
+		// Tell our predessor we're leaving
+		SuccessorLeaving sucLeaving = new SuccessorLeaving(state.successor.hostname, state.successor.port, state.successor.id);
+		Link predLink = connect(state.predecessor);
+		predLink.sendData(sucLeaving.marshall());
+		
 	}
 
 	//================================================================================
@@ -159,6 +189,7 @@ public class PeerNode extends Node{
 
 			// If we are the target, handle it
 			if (state.itemIsMine(resolveID)) {
+				
 				LookupResponse response = new LookupResponse(hostname, port, id, resolveID, entry);
 				Peer requester = new Peer(requesterHost, requesterPort, requesterID);
 				Link requesterLink = connect(requester);
@@ -172,9 +203,14 @@ public class PeerNode extends Node{
 				//System.out.println("is not mine : " + resolveID);
 				Peer nextPeer = state.getNexClosestPeer(resolveID);
 				Link nextHop = connect(nextPeer);
+
+				if (lookup.hopCount > 10) {
+					System.exit(1);
+				}
 				
 				lookup.hopCount++;
 				System.out.println("Routing query from " + lookup);
+				System.out.println("sending to : " + nextPeer.id);
 				nextHop.sendData(lookup.marshall());
 			}
 
@@ -200,7 +236,7 @@ public class PeerNode extends Node{
 
 			// Add this node as our predessesor
 			Peer pred = new Peer(predReq.hostName, predReq.port, predReq.id);
-			state.addPredecessor(pred);
+			state.addPredecessor(pred,false);
 
 			break;
 
@@ -210,14 +246,14 @@ public class PeerNode extends Node{
 			predResp.unmarshall(bytes);
 
 			Peer p = new Peer(predResp.hostName, predResp.port, predResp.id);
-			state.addPredecessor(p);
+			state.addPredecessor(p, false);
 
 			if (state.successor.id != state.predecessor.id) {
 				SuccessorRequest sucReq = new SuccessorRequest(hostname, port, id);
 				Link successorLink = connect(p);
 				successorLink.sendData(sucReq.marshall());
 			}
-			
+
 			break;
 
 		case Constants.Successor_Request:
@@ -226,10 +262,28 @@ public class PeerNode extends Node{
 			sReq.unmarshall(bytes);
 
 			Peer sucessor = new Peer(sReq.hostName, sReq.port, sReq.id);
-			state.addSucessor(sucessor);
+			state.addSucessor(sucessor, false);
 
 			break;
 
+		case Constants.Predessesor_Leaving:
+			PredessesorLeaving predLeaving = new PredessesorLeaving();
+			predLeaving.unmarshall(bytes);
+			
+			Peer newPred = new Peer(predLeaving.hostName, predLeaving.port, predLeaving.id);
+			state.addPredecessor(newPred,true);
+			
+			break;
+			
+		case Constants.Successor_Leaving:
+			SuccessorLeaving sucLeaving = new SuccessorLeaving();
+			sucLeaving.unmarshall(bytes);
+			
+			Peer newSuc = new Peer(sucLeaving.hostName, sucLeaving.port, sucLeaving.id);
+			state.addSucessor(newSuc, true);
+			
+			break;
+			
 		default:
 			System.out.println("Unrecognized Message : " + messageType);
 			break;
@@ -243,7 +297,7 @@ public class PeerNode extends Node{
 	public void printDiagnostics() {
 		System.out.println(state);
 	}
-
+	
 	//================================================================================
 	//================================================================================
 	// Main
@@ -284,5 +338,17 @@ public class PeerNode extends Node{
 		peer.initServer();
 		peer.enterDHT(discoveryHost, discoveryPort);
 
+		// Wait and accept User Commands
+		boolean cont = true;
+		while (cont){
+			String input = Tools.readInput("Command: ");
+
+			if (input.equalsIgnoreCase("exit")){
+				peer.leaveDHT();
+				cont = false;
+				System.exit(0);
+				
+			}
+		}
 	}
 }

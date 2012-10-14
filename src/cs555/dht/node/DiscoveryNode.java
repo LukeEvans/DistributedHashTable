@@ -85,6 +85,7 @@ public class DiscoveryNode extends Node{
 			Peer removePeer = new Peer(deregisterRequest.hostName, deregisterRequest.port, deregisterRequest.id);
 			peerList.removePeer(removePeer);
 
+			System.out.println(removePeer.id + " has left the system");
 			break;
 
 		default:

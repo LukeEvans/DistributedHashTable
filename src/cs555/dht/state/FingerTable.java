@@ -55,19 +55,12 @@ public class FingerTable {
 				return table[0];
 			}
 		}
-		
-		// If the id is passed our purview, send it as far as we can
-		if (h > table[table.length - 1].id) {
-			if (table[Constants.Id_Space-1].id != id){
-				return table[Constants.Id_Space - 1];
-			}
-		}
 
 		// Else, pass it the next best choice
 		Peer bestChoice = table[0];
 
 		for (Peer p : table) {
-			if ( (p.id > bestChoice.id) && (p.id < h)) {
+			if ( (p.id > bestChoice.id) && (p.id <= h)) {
 
 				if (p.id != id){
 					bestChoice = p;
@@ -92,7 +85,7 @@ public class FingerTable {
 		table[location] = p;
 		size++;
 
-		if (size >= Constants.Id_Space) {
+		if (size == Constants.Id_Space) {
 			node.printDiagnostics();
 		}
 	}

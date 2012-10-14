@@ -33,8 +33,12 @@ public class State {
 	// State manipulation
 	//================================================================================
 	// Check successor candidate
-	public boolean shouldAddNewSuccessor(Peer p) {
+	public boolean shouldAddNewSuccessor(Peer p, boolean force) {
 
+		if (force) {
+			return true;
+		}
+		
 		if (successor != null) {
 			if (successor.id == p.id) {
 				return false;
@@ -67,8 +71,8 @@ public class State {
 		return false;
 	}
 
-	public void addSucessor(Peer p) {
-		if (!shouldAddNewSuccessor(p)) {
+	public void addSucessor(Peer p, boolean force) {
+		if (!shouldAddNewSuccessor(p, force)) {
 			return;
 		}
 		
@@ -87,12 +91,20 @@ public class State {
 			// Our successor changed, update finger table
 			fingerTable.buildFingerTable();
 		}
+		
+		else {
+			myself.printDiagnostics();
+		}
 
 	}
 
 	// check predeccessor candidate
-	public boolean shouldAddNewPredecessor(Peer p) {
+	public boolean shouldAddNewPredecessor(Peer p, boolean force) {
 
+		if (force) {
+			return true;
+		}
+		
 		if (p.id == thisID) {
 			return false;
 		}
@@ -114,9 +126,9 @@ public class State {
 		return false;
 	}
 
-	public void addPredecessor(Peer p) {
+	public void addPredecessor(Peer p, boolean force) {
 
-		if (!shouldAddNewPredecessor(p)) {		
+		if (!shouldAddNewPredecessor(p, force)) {		
 			return;
 		}
 
@@ -124,15 +136,15 @@ public class State {
 
 		// If our successor is ourself, and p as our successor as well
 		if (successor.id == thisID) {
-			addSucessor(p);
+			addSucessor(p, false);
 		}
 	}
 
 	// Set all values to self
 	public void firstToArrive() {
 		Peer thisPeer = new Peer(myself.hostname, myself.port, myself.id);
-		addSucessor(thisPeer);
-		addPredecessor(thisPeer);
+		addSucessor(thisPeer, true);
+		addPredecessor(thisPeer,true);
 
 		// Add thisPeer as all values in FT
 		fingerTable.fillTableWith(thisPeer);
@@ -152,7 +164,7 @@ public class State {
 
 		// If it's our first entry getting back to us, add it as our sucessor
 		if (l.ftEntry == 0) {
-			addSucessor(peer);
+			addSucessor(peer, false);
 		}
 
 		fingerTable.addEntry(l.ftEntry, peer);

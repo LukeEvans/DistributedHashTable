@@ -1,7 +1,9 @@
 package cs555.dht.utilities;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.Inet4Address;
@@ -115,6 +117,23 @@ public class Tools {
 			printStackTrace(e);
 		}
 	}
+	
+	// Accept user input
+    public static String readInput(String output) {
+        // TODO Auto-generated method stub
+        String input = "";
+        System.out.println(output);
+
+        BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
+        try {
+                input = stdin.readLine();
+        } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+        }
+
+        return input;
+    }
 	//================================================================================
 	// Byte Manipulations
 	//================================================================================
