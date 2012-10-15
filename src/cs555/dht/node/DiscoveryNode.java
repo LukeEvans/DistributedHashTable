@@ -7,6 +7,7 @@ import cs555.dht.utilities.Constants;
 import cs555.dht.utilities.Tools;
 import cs555.dht.wireformats.DeregisterRequest;
 import cs555.dht.wireformats.Payload;
+import cs555.dht.wireformats.RandomPeerResponse;
 import cs555.dht.wireformats.RegisterRequest;
 import cs555.dht.wireformats.RegisterResponse;
 import cs555.dht.wireformats.Verification;
@@ -88,8 +89,16 @@ public class DiscoveryNode extends Node{
 			System.out.println(removePeer.id + " has left the system");
 			break;
 
+		case Constants.RandomPeer_Requst:
+			
+			Peer poc = peerList.getNextPeer();
+			RandomPeerResponse randomPeer = new RandomPeerResponse(poc.hostname, poc.port, poc.id);
+			l.sendData(randomPeer.marshall());
+			
+			break;
+			
 		default:
-			System.out.println("Unrecognized Message");
+			System.out.println("Unrecognized Message " + messageType);
 			break;
 		}
 	}

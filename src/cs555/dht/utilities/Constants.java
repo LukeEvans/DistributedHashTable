@@ -20,6 +20,8 @@ public class Constants {
 	public static final int Successor_Request = 14;
 	public static final int Successor_Leaving = 15;
 	public static final int Predessesor_Leaving = 16;
+	public static final int RandomPeer_Requst = 17;
+	public static final int RandomPeer_Response = 18;
 	
 	// Flags
 	public static final int Undefined = -1;

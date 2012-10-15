@@ -36,8 +36,33 @@ public class StoreData extends Node {
 
 	public void initLookup(String dHost, int dPort) {
 		Link managerLink = connect(new Peer(dHost, dPort));
-		LookupRequest req = new LookupRequest(hostName, port, filehash, filehash, Constants.Store_Lookup);
-		managerLink.sendData(req.marshall());
+		
+		// Get random peer from discovery
+		RandomPeerRequest randomReq = new RandomPeerRequest(hostName, port, filehash);
+		managerLink.sendData(randomReq.marshall());
+		
+		byte[] randomNodeData = managerLink.waitForData();
+		int msgType = Tools.getMessageType(randomNodeData);
+		
+		switch (msgType) {
+		case Constants.RandomPeer_Response:
+			
+			RandomPeerResponse randomRes = new RandomPeerResponse();
+			randomRes.unmarshall(randomNodeData);
+			
+			LookupRequest lookupReq = new LookupRequest(hostName, port, filehash, filehash, Constants.store_request);
+			Peer accessPoint = new Peer(randomRes.hostName, randomRes.port, randomRes.id);
+			Link accessLink = connect(accessPoint);
+			
+			System.out.println("access point : " + accessPoint.id);
+			
+			accessLink.sendData(lookupReq.marshall());
+			
+			break;
+
+		default:
+			break;
+		}
 	}
 
 	//================================================================================
@@ -50,9 +75,9 @@ public class StoreData extends Node {
 		switch (messageType) {
 		case Constants.lookup_reply:
 
-			System.out.println("Lookup Reply");
 			LookupResponse response = new LookupResponse();
 			response.unmarshall(bytes);
+			System.out.println("Data belongs to: " + response.id);
 			
 			Peer candidate = new Peer(response.hostName, response.port);
 			Link candidateLink = connect(candidate);

@@ -283,6 +283,16 @@ public class PeerNode extends Node{
 			
 			break;
 			
+		case Constants.Payload:
+			Payload payload = new Payload();
+			payload.unmarshall(bytes);
+			
+			if (payload.number == Constants.store_request) {
+				System.out.println("Storing data");
+			}
+			
+			break;
+			
 		default:
 			System.out.println("Unrecognized Message : " + messageType);
 			break;
