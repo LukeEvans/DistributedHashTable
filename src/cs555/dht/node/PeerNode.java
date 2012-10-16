@@ -16,6 +16,7 @@ import cs555.dht.wireformats.RegisterRequest;
 import cs555.dht.wireformats.RegisterResponse;
 import cs555.dht.wireformats.SuccessorLeaving;
 import cs555.dht.wireformats.SuccessorRequest;
+import cs555.dht.wireformats.TransferRequest;
 import cs555.dht.wireformats.Verification;
 
 public class PeerNode extends Node{
@@ -283,13 +284,14 @@ public class PeerNode extends Node{
 			
 			break;
 			
-		case Constants.Payload:
-			Payload payload = new Payload();
-			payload.unmarshall(bytes);
+		case Constants.store_request:
+			TransferRequest storeReq = new TransferRequest();
+			storeReq.unmarshall(bytes);
 			
-			if (payload.number == Constants.store_request) {
-				System.out.println("Storing data");
-			}
+			Verification cont = new Verification(Constants.Continue);
+			l.sendData(cont.marshall());
+			
+			Tools.receiveFile(storeReq.path, l.socket);
 			
 			break;
 			

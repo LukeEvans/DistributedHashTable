@@ -1,10 +1,6 @@
 package cs555.dht.utilities;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.math.BigInteger;
 import java.net.Inet4Address;
 import java.net.Socket;
@@ -134,6 +130,74 @@ public class Tools {
 
         return input;
     }
+    
+    //================================================================================
+	// File sending and receieving
+	//================================================================================
+	public static boolean sendFile(String sPath,Socket sock) {
+		// TODO Auto-generated method stub
+		// sendfile
+
+		try {
+
+			File myFile = new File (sPath);
+			byte [] mybytearray  = new byte [(int)myFile.length()];
+			FileInputStream fis = new FileInputStream(myFile);
+			BufferedInputStream bis = new BufferedInputStream(fis);
+			bis.read(mybytearray,0,mybytearray.length);
+			OutputStream os = sock.getOutputStream();
+			System.out.println("Sending...");
+			os.write(mybytearray,0,mybytearray.length);
+			os.flush();
+			
+			System.out.println("Sent file : " + sPath);
+			sock.close();
+			bis.close();
+			return true;
+
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+			return false;
+		}
+
+	}
+
+	public static boolean receiveFile(String path,Socket sock) {
+		int bytesRead;
+		int current = 0;
+
+		try {
+			System.out.println("Connecting...");
+			// receive file
+			byte [] mybytearray  = new byte [Constants.LEN_BYTES];
+			InputStream is = sock.getInputStream();
+			FileOutputStream fos = new FileOutputStream(path);
+			BufferedOutputStream bos = new BufferedOutputStream(fos);
+			bytesRead = is.read(mybytearray,0,mybytearray.length);
+			current = bytesRead;
+
+			do {
+				bytesRead = is.read(mybytearray, current, (mybytearray.length-current));
+				if(bytesRead >= 0) current += bytesRead;
+			} while(bytesRead > -1);
+
+			bos.write(mybytearray, 0 , current);
+			bos.flush();
+
+			bos.close();
+			sock.close();
+			return true;
+
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+			return false;
+		}
+	}
+    
+    
+    
 	//================================================================================
 	// Byte Manipulations
 	//================================================================================

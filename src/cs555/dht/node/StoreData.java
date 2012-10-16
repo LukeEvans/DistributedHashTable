@@ -87,8 +87,14 @@ public class StoreData extends Node {
 			Payload sendReq = new Payload(Constants.store_request);
 			candidateLink.sendData(sendReq.marshall());
 			
+			// Send store request
+			String filePath = Constants.base_path + filename;
+			TransferRequest storeReq = new TransferRequest(filePath);
+			candidateLink.sendData(storeReq.marshall());
+			
 			if (candidateLink.waitForIntReply() == Constants.Continue) {
 				// Send data item to candidate
+				Tools.sendFile(filename, candidateLink.socket);
 			}
 			
 			break;
