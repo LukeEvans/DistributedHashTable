@@ -58,6 +58,8 @@ public class StoreData extends Node {
 			
 			accessLink.sendData(lookupReq.marshall());
 			
+			System.out.println("Looking up hash : " + lookupReq.resolveID);
+			
 			break;
 
 		default:
