@@ -32,6 +32,7 @@ public class TransferRequest {
 	public void init(String p) {
 		size = 4 + 4 + p.length();
 		type = Constants.store_request;
+		pathLen = p.length();
 		path = p;
 		
 	}
