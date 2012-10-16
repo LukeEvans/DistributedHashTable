@@ -187,6 +187,8 @@ public class Tools {
 
 			bos.close();
 			sock.close();
+			
+			System.out.println("Received File : " + path);
 			return true;
 
 		} catch (Exception e)
