@@ -113,25 +113,25 @@ public class Tools {
 			printStackTrace(e);
 		}
 	}
-	
+
 	// Accept user input
-    public static String readInput(String output) {
-        // TODO Auto-generated method stub
-        String input = "";
-        System.out.println(output);
+	public static String readInput(String output) {
+		// TODO Auto-generated method stub
+		String input = "";
+		System.out.println(output);
 
-        BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
-        try {
-                input = stdin.readLine();
-        } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-        }
+		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
+		try {
+			input = stdin.readLine();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-        return input;
-    }
-    
-    //================================================================================
+		return input;
+	}
+
+	//================================================================================
 	// File sending and receieving
 	//================================================================================
 	public static boolean sendFile(String sPath,Socket sock) {
@@ -149,10 +149,10 @@ public class Tools {
 			System.out.println("Sending...");
 			os.write(mybytearray,0,mybytearray.length);
 			os.flush();
-			
+
 			System.out.println("Sent file : " + sPath);
 			sock.close();
-			bis.close();
+			//bis.close();
 			return true;
 
 		} catch (Exception e)
@@ -187,7 +187,7 @@ public class Tools {
 
 			bos.close();
 			sock.close();
-			
+
 			System.out.println("Received File : " + path);
 			return true;
 
@@ -197,9 +197,9 @@ public class Tools {
 			return false;
 		}
 	}
-    
-    
-    
+
+
+
 	//================================================================================
 	// Byte Manipulations
 	//================================================================================
@@ -248,7 +248,7 @@ public class Tools {
 		// Timestamp
 		long epoch = System.currentTimeMillis()/1000;
 		generateHash(String.valueOf(epoch));
-		
+
 		return generateHash(String.valueOf(epoch));
 
 	}

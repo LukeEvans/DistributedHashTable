@@ -293,7 +293,13 @@ public class PeerNode extends Node{
 			Verification cont = new Verification(Constants.Continue);
 			l.sendData(cont.marshall());
 			
-			Tools.receiveFile(storeReq.path, l.socket);
+			if (Tools.receiveFile(storeReq.path, l.socket)) {
+				System.out.println("Receieved file");
+			}
+			
+			else {
+				System.out.println("Could not read : " + storeReq.path);
+			}
 			
 			break;
 			
