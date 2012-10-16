@@ -84,8 +84,6 @@ public class StoreData extends Node {
 			Peer candidate = new Peer(response.hostName, response.port);
 			Link candidateLink = connect(candidate);
 			
-			Payload sendReq = new Payload(Constants.store_request);
-			candidateLink.sendData(sendReq.marshall());
 			
 			// Send store request
 			String filePath = Constants.base_path + filename;

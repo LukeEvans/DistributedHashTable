@@ -288,6 +288,8 @@ public class PeerNode extends Node{
 			TransferRequest storeReq = new TransferRequest();
 			storeReq.unmarshall(bytes);
 			
+			System.out.println("Got store request : " + storeReq);
+			
 			Verification cont = new Verification(Constants.Continue);
 			l.sendData(cont.marshall());
 			
