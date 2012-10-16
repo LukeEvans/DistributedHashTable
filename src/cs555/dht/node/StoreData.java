@@ -89,6 +89,7 @@ public class StoreData extends Node {
 			String filePath = Constants.base_path + filename;
 			TransferRequest storeReq = new TransferRequest(filePath);
 			candidateLink.sendData(storeReq.marshall());
+			System.out.println("Requesting : " + storeReq);
 			
 			if (candidateLink.waitForIntReply() == Constants.Continue) {
 				// Send data item to candidate

@@ -3,6 +3,7 @@ package cs555.dht.wireformats;
 import java.nio.ByteBuffer;
 
 import cs555.dht.utilities.Constants;
+import cs555.dht.utilities.Tools;
 
 /**
  * 
@@ -50,8 +51,7 @@ public class TransferRequest {
 		
 		// Path length and path
 		bbuff.putInt(pathLen);
-		bbuff.put(path.getBytes());
-		
+		bbuff.put(Tools.convertToBytes(path));
 		
 		return bytes;
 		
