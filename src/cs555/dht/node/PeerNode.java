@@ -1,5 +1,7 @@
 package cs555.dht.node;
 
+import java.util.ArrayList;
+
 import cs555.dht.communications.Link;
 import cs555.dht.data.DataItem;
 import cs555.dht.data.DataList;
@@ -155,7 +157,8 @@ public class PeerNode extends Node{
 		}
 		
 		// Remove all items from file system
-		for (DataItem d : dataList.getAllData()) {
+		ArrayList<DataItem> filesToRemove = dataList.getAllData();
+		for (DataItem d : filesToRemove) {
 			dataList.removeData(d);
 		}
 	}
