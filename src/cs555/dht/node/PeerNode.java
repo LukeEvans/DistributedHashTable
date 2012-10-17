@@ -185,11 +185,12 @@ public class PeerNode extends Node{
 		// Send store request
 		TransferRequest storeReq = new TransferRequest(d.filename, d.filehash);
 		link.sendData(storeReq.marshall());
-		System.out.println("Requesting : " + storeReq);
-		
+
+		System.out.println("Waiting for successor to ack");
 		if (link.waitForIntReply() == Constants.Continue) {
 			// Send data item to candidate
 			Tools.sendFile(d.filename, link.socket);
+			
 		}
 	}
 	
@@ -315,6 +316,8 @@ public class PeerNode extends Node{
 						
 			Verification cont = new Verification(Constants.Continue);
 			l.sendData(cont.marshall());
+			
+			System.out.println("Waiting for file");
 			
 			// If we receive file, add it to our data list
 			if (Tools.receiveFile(storeReq.path, l.socket)) {
