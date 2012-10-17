@@ -152,6 +152,7 @@ public class PeerNode extends Node{
 		// Pass all data to our successor
 		for (DataItem d : dataList.getAllData()) {
 			transferData(d, state.successor);
+			dataList.removeData(d);
 		}
 	}
 
