@@ -153,7 +153,7 @@ public class Tools {
 
 			System.out.println("Sent file : " + sPath);
 			sock.close();
-			//bis.close();
+			bis.close();
 			return true;
 
 		} catch (Exception e)
@@ -169,6 +169,8 @@ public class Tools {
 		int bytesRead;
 		int current = 0;
 
+		path = Constants.base_path + path;
+		
 		try {
 			System.out.println("Connecting...");
 			// receive file
@@ -190,7 +192,6 @@ public class Tools {
 			bos.close();
 			sock.close();
 
-			System.out.println("Received File : " + path);
 			return true;
 
 		} catch (Exception e)

@@ -15,23 +15,25 @@ public class TransferRequest {
 	
 	public int size; //4
 	public int type; //4
+	public int filehash; //4
 	public int pathLen; //4
 	public String path; //pathLen
 	
 	//================================================================================
 	// Constructors
 	//================================================================================
-	public TransferRequest(String p){
-		init(p);
+	public TransferRequest(String p, int h){
+		init(p, h);
 	}
 	
 	public TransferRequest(){
-		init("");
+		init("",-1);
 	}
 	
-	public void init(String p) {
-		size = 4 + 4 + p.length();
+	public void init(String p, int h) {
+		size = 4 + 4 + 4 + p.length();
 		type = Constants.store_request;
+		filehash = h;
 		pathLen = p.length();
 		path = p;
 		
@@ -50,6 +52,9 @@ public class TransferRequest {
 		// Type of data
 		bbuff.putInt(type);
 		
+		// filehash 
+		bbuff.putInt(filehash);
+		
 		// Path length and path
 		bbuff.putInt(pathLen);
 		bbuff.put(Tools.convertToBytes(path));
@@ -67,6 +72,9 @@ public class TransferRequest {
 		// Type of message
 		type = bbuff.getInt();
 
+		// File hash
+		filehash = bbuff.getInt();
+		
 		// Path
 		pathLen = bbuff.getInt();
 		byte[] pathBytes = new byte[pathLen];

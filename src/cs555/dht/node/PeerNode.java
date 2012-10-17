@@ -1,6 +1,8 @@
 package cs555.dht.node;
 
 import cs555.dht.communications.Link;
+import cs555.dht.data.DataItem;
+import cs555.dht.data.DataList;
 import cs555.dht.peer.Peer;
 import cs555.dht.state.RefreshThread;
 import cs555.dht.state.State;
@@ -31,7 +33,8 @@ public class PeerNode extends Node{
 	public int id;
 
 	State state;
-
+	DataList dataList;
+	
 	RefreshThread refreshThread;
 
 	//================================================================================
@@ -53,6 +56,8 @@ public class PeerNode extends Node{
 		hostname = Tools.getLocalHostname();
 
 		refreshThread = new RefreshThread(this, refreshTime);
+		
+		dataList = new DataList();
 	}
 
 	//================================================================================
@@ -287,14 +292,18 @@ public class PeerNode extends Node{
 		case Constants.store_request:
 			TransferRequest storeReq = new TransferRequest();
 			storeReq.unmarshall(bytes);
-			
-			System.out.println("Got store request : " + storeReq);
-			
+						
 			Verification cont = new Verification(Constants.Continue);
 			l.sendData(cont.marshall());
 			
+			// If we receive file, add it to our data list
 			if (Tools.receiveFile(storeReq.path, l.socket)) {
-				System.out.println("Receieved file");
+				System.out.println("Receieved file: " + storeReq.path);
+				
+				DataItem data = new DataItem(storeReq.path, storeReq.filehash);
+				dataList.addData(data);
+				
+				printDiagnostics();
 			}
 			
 			else {
@@ -315,6 +324,7 @@ public class PeerNode extends Node{
 	//================================================================================
 	public void printDiagnostics() {
 		System.out.println(state);
+		System.out.println(dataList);
 	}
 	
 	//================================================================================
