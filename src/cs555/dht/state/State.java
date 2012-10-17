@@ -138,6 +138,9 @@ public class State {
 		if (successor.id == thisID) {
 			addSucessor(p, false);
 		}
+		
+		// Move relevant data items 
+		myself.transferDataToPredesessor();
 	}
 
 	// Set all values to self
@@ -215,12 +218,10 @@ public class State {
 	public String toString(){
 		String s = "";
 
-		s += "\n================================================================================\n";
 		s += "Diagnostics at node: " + thisID + "\n";
 		s += "Predesessor: " + predecessor.id + "\n";
 		s += "Sucessor: " + successor.id + "\n";
 		s += "\nFT: \n" + fingerTable.toString();
-		s += "================================================================================\n";
 
 		return s;
 	}

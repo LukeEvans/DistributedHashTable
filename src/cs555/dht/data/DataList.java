@@ -47,7 +47,15 @@ public class DataList {
 	//================================================================================
 	// Returns a list of data items >= to id
 	public ArrayList<DataItem> subsetToMove(int id) {
-		return null;
+		ArrayList<DataItem> subset = new ArrayList<DataItem>();
+		
+		for (DataItem d : dataList) {
+			if (d.filehash <= id) {
+				subset.add(d);
+			}
+		}
+		
+		return subset;
 	}
 	
 	public ArrayList<DataItem> getAllData() {

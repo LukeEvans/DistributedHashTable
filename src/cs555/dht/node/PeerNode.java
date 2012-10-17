@@ -171,6 +171,21 @@ public class PeerNode extends Node{
 		state.update();
 	}
 
+	public void transferDataToPredesessor() {
+		ArrayList<DataItem> subset = new ArrayList<DataItem>(dataList.subsetToMove(state.predecessor.id));
+		
+		// Move all data our predessor should be in charge of
+		for (DataItem d : subset) {
+			transferData(d, state.predecessor);
+		}
+		
+		// Remove these items from preddessesor
+		for (DataItem d : subset) {
+			dataList.removeData(d);
+		}
+		
+	}
+	
 	//================================================================================
 	// Send
 	//================================================================================
@@ -201,7 +216,6 @@ public class PeerNode extends Node{
 		if (link.waitForIntReply() == Constants.Continue) {
 			// Send data item to candidate
 			Tools.sendFile(d.filename, link.socket);
-			
 		}
 	}
 	
@@ -359,8 +373,10 @@ public class PeerNode extends Node{
 	// Diagnostics
 	//================================================================================
 	public void printDiagnostics() {
+		System.out.println("\n================================================================================\n");
 		System.out.println(state);
 		System.out.println(dataList);
+		System.out.println("\n================================================================================\n");
 	}
 	
 	//================================================================================
