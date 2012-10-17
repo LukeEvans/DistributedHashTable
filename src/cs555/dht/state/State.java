@@ -219,6 +219,10 @@ public class State {
 	public Peer getNextSuccessor() {
 		Peer p = fingerTable.getNextSuccessor();
 		addPredecessor(p, true);
+		
+		// Rebuild finger table
+		fingerTable.buildFingerTable();
+		
 		return p;
 	}
 	
