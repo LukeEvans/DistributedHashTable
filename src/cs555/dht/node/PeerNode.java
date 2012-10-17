@@ -207,6 +207,11 @@ public class PeerNode extends Node{
 		
 		Link link = connect(p);
 		
+		if (link == null){
+			link = connect(state.getNextSuccessor());
+			
+		}
+		
 		// Send store request
 		TransferRequest storeReq = new TransferRequest(d.filename, d.filehash);
 		link.sendData(storeReq.marshall());
