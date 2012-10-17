@@ -59,6 +59,10 @@ public class FingerTable {
 		// Else, pass it the next best choice
 		Peer bestChoice = table[0];
 
+		if (h < table[0].id) {
+			bestChoice = getBetterStartingPoint(h);
+		}
+		
 		for (Peer p : table) {
 			if ( (p.id > bestChoice.id) && (p.id <= h)) {
 
@@ -71,6 +75,18 @@ public class FingerTable {
 		return bestChoice;
 	}
 
+	// Get the first peer that has a lower id
+	public Peer getBetterStartingPoint(int h) {
+		
+		for (Peer p : table) {
+			if (p.id < h) {
+				return p;
+			}
+		}
+		
+		return table[0];
+	}
+	
 	//================================================================================
 	// State manipulation
 	//================================================================================
