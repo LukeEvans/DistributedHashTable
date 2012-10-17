@@ -142,7 +142,6 @@ public class Tools {
 
 			File myFile = new File(sPath);
 			byte [] mybytearray  = new byte [(int)myFile.length()];
-			System.out.println("length : " + mybytearray.length);
 			FileInputStream fis = new FileInputStream(myFile);
 			BufferedInputStream bis = new BufferedInputStream(fis);
 			bis.read(mybytearray,0,mybytearray.length);
