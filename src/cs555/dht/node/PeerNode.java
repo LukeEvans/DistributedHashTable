@@ -187,6 +187,7 @@ public class PeerNode extends Node{
 		link.sendData(storeReq.marshall());
 
 		System.out.println("Waiting for successor to ack");
+		
 		if (link.waitForIntReply() == Constants.Continue) {
 			// Send data item to candidate
 			Tools.sendFile(d.filename, link.socket);
@@ -314,6 +315,8 @@ public class PeerNode extends Node{
 			TransferRequest storeReq = new TransferRequest();
 			storeReq.unmarshall(bytes);
 						
+			System.out.println("Recieved store request");
+			
 			Verification cont = new Verification(Constants.Continue);
 			l.sendData(cont.marshall());
 			
