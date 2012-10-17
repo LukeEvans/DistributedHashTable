@@ -89,7 +89,8 @@ public class State {
 			// Add successor to FT[0]
 			fingerTable.addEntry(0, successor);
 			// Our successor changed, update finger table
-			fingerTable.buildFingerTable();
+			//fingerTable.buildFingerTable();
+			update();
 		}
 		
 		else {

@@ -70,6 +70,11 @@ public class FingerTable {
 					bestChoice = p;
 				}
 			}
+			
+			// If we have a link to node with id of h, just send it there
+			if (p.id == h) {
+				return p;
+			}
 		}
 
 		return bestChoice;
