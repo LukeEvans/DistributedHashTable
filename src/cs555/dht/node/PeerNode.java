@@ -260,6 +260,11 @@ public class PeerNode extends Node{
 				Peer nextPeer = state.getNexClosestPeer(resolveID);
 				Link nextHop = connect(nextPeer);
 				
+				if (nextHop == null) {
+					state.update();
+					return;
+				}
+				
 				lookup.hopCount++;
 				System.out.println("Routing query from " + lookup);
 				nextHop.sendData(lookup.marshall());
