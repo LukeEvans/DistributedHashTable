@@ -149,6 +149,10 @@ public class PeerNode extends Node{
 		Link predLink = connect(state.predecessor);
 		predLink.sendData(sucLeaving.marshall());
 		
+		// Pass all data to our successor
+		for (DataItem d : dataList.getAllData()) {
+			transferData(d, successorLink);
+		}
 	}
 
 	//================================================================================
@@ -173,6 +177,22 @@ public class PeerNode extends Node{
 		sucessorLink.sendData(r.marshall());
 	}
 
+	//================================================================================
+	// Transfer data
+	//================================================================================
+	public void transferData(DataItem d, Link link) {
+		
+		// Send store request
+		TransferRequest storeReq = new TransferRequest(d.filename, d.filehash);
+		link.sendData(storeReq.marshall());
+		System.out.println("Requesting : " + storeReq);
+		
+		if (link.waitForIntReply() == Constants.Continue) {
+			// Send data item to candidate
+			Tools.sendFile(d.filename, link.socket);
+		}
+	}
+	
 	//================================================================================
 	// Receive
 	//================================================================================

@@ -31,6 +31,10 @@ public class DataList {
 		return null;
 	}
 	
+	public ArrayList<DataItem> getAllData() {
+		return dataList;
+	}
+	
 	//================================================================================
 	// House Keeping
 	//================================================================================
