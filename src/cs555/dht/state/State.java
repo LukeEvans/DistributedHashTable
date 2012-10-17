@@ -158,7 +158,9 @@ public class State {
 	// Update State
 	//================================================================================
 	public void update() {
-		fingerTable.buildFingerTable();
+		//fingerTable.buildFingerTable();
+		PredessesorRequest req = new PredessesorRequest(myself.hostname, myself.port, myself.id);
+		myself.sendPredessessorRequest(successor, req);
 	}
 
 	// Decide where to put this peer in Finger Table
