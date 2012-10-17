@@ -157,7 +157,7 @@ public class PeerNode extends Node{
 		}
 		
 		// Remove all items from file system
-		ArrayList<DataItem> filesToRemove = dataList.getAllData();
+		ArrayList<DataItem> filesToRemove = new ArrayList<DataItem>(dataList.getAllData());
 		for (DataItem d : filesToRemove) {
 			dataList.removeData(d);
 		}
