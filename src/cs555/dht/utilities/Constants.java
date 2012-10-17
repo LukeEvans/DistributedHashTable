@@ -30,8 +30,8 @@ public class Constants {
 	public static final int Failure = 99;
 	public static final int Success = 100;
 	
-	// Message sizes
-	public static final int LEN_BYTES = 3072;
+	// Max message sizes
+	public static final int LEN_BYTES = 6022386;
 	
 	// ID space of DHT
 	public static final int Id_Space = 4;

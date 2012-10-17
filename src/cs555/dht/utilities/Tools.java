@@ -140,8 +140,9 @@ public class Tools {
 
 		try {
 
-			File myFile = new File (sPath);
+			File myFile = new File(sPath);
 			byte [] mybytearray  = new byte [(int)myFile.length()];
+			System.out.println("length : " + mybytearray.length);
 			FileInputStream fis = new FileInputStream(myFile);
 			BufferedInputStream bis = new BufferedInputStream(fis);
 			bis.read(mybytearray,0,mybytearray.length);
@@ -160,6 +161,7 @@ public class Tools {
 			e.printStackTrace();
 			return false;
 		}
+		
 
 	}
 
