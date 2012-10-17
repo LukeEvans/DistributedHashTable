@@ -2,6 +2,9 @@ package cs555.dht.data;
 
 import java.util.ArrayList;
 
+import cs555.dht.utilities.Constants;
+import cs555.dht.utilities.Tools;
+
 public class DataList {
 
 	ArrayList<DataItem> dataList;
@@ -23,6 +26,16 @@ public class DataList {
 		}
 	}
 
+	public void removeData(DataItem d) {
+		for (int i=0; i<dataList.size(); i++) {
+			if (dataList.get(i).equals(d)) {
+				dataList.remove(i);
+				
+				Tools.removeFile(Constants.base_path + dataList.get(i).filename);
+			}
+		}
+	}
+	
 	//================================================================================
 	// Accessor methods
 	//================================================================================
