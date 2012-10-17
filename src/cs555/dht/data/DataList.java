@@ -27,9 +27,16 @@ public class DataList {
 	}
 
 	public void removeData(DataItem d) {
+		// Remove from fs
 		for (int i=0; i<dataList.size(); i++) {
 			if (dataList.get(i).equals(d)) {
 				Tools.removeFile(Constants.base_path + dataList.get(i).filename);
+			}
+		}
+		
+		// Remove from list
+		for (int i=0; i<dataList.size(); i++) {
+			if (dataList.get(i).equals(d)) {
 				dataList.remove(i);
 			}
 		}
