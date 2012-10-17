@@ -71,7 +71,7 @@ public class DataList {
 		s += "Data: \n";
 		
 		for (DataItem d : dataList){
-			s += d.toString();
+			s += d.toString() + "\n";
 		}
 
 		return s;
