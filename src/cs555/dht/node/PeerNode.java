@@ -151,7 +151,7 @@ public class PeerNode extends Node{
 		
 		// Pass all data to our successor
 		for (DataItem d : dataList.getAllData()) {
-			transferData(d, successorLink);
+			transferData(d, state.successor);
 		}
 	}
 
@@ -180,7 +180,9 @@ public class PeerNode extends Node{
 	//================================================================================
 	// Transfer data
 	//================================================================================
-	public void transferData(DataItem d, Link link) {
+	public void transferData(DataItem d, Peer p) {
+		
+		Link link = connect(p);
 		
 		// Send store request
 		TransferRequest storeReq = new TransferRequest(d.filename, d.filehash);
