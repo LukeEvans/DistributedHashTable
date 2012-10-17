@@ -29,9 +29,8 @@ public class DataList {
 	public void removeData(DataItem d) {
 		for (int i=0; i<dataList.size(); i++) {
 			if (dataList.get(i).equals(d)) {
-				dataList.remove(i);
-				
 				Tools.removeFile(Constants.base_path + dataList.get(i).filename);
+				dataList.remove(i);
 			}
 		}
 	}
