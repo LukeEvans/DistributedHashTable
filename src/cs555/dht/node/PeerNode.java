@@ -254,10 +254,6 @@ public class PeerNode extends Node{
 				//System.out.println("is not mine : " + resolveID);
 				Peer nextPeer = state.getNexClosestPeer(resolveID);
 				Link nextHop = connect(nextPeer);
-
-				if (lookup.hopCount > 10) {
-					System.exit(1);
-				}
 				
 				lookup.hopCount++;
 				System.out.println("Routing query from " + lookup);
